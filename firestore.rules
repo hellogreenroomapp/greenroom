@@ -1,0 +1,134 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if user is a brand member
+    function isBrandMember(brandId) {
+      return request.auth != null && 
+             exists(/databases/$(database)/documents/brandMembers/$(brandId + '_' + request.auth.uid));
+    }
+    
+    // Helper function to check if user is brand owner or admin
+    function isBrandOwnerOrAdmin(brandId) {
+      return request.auth != null && (
+        get(/databases/$(database)/documents/brands/$(brandId)).data.ownerId == request.auth.uid ||
+        get(/databases/$(database)/documents/brandMembers/$(brandId + '_' + request.auth.uid)).data.role in ['owner', 'admin']
+      );
+    }
+    
+    // Helper function to extract userId from document ID (format: userId_brandId)
+    function getUserIdFromDocId(docId) {
+      return docId.split('_')[0];
+    }
+    
+    // Helper function to extract brandId from document ID (format: userId_brandId)
+    function getBrandIdFromDocId(docId) {
+      return docId.split('_')[1];
+    }
+
+    // Collection: brands
+    match /brands/{brandId} {
+      allow read: if request.auth != null && (
+        resource.data.ownerId == request.auth.uid ||
+        isBrandMember(brandId)
+      );
+      allow create: if request.auth != null;
+      allow update: if request.auth != null && isBrandOwnerOrAdmin(brandId);
+      allow delete: if request.auth != null && resource.data.ownerId == request.auth.uid;
+    }
+
+    // Collection: brandMembers
+    match /brandMembers/{memberId} {
+      allow read: if request.auth != null && (
+        resource.data.userId == request.auth.uid ||
+        isBrandMember(resource.data.brandId)
+      );
+      allow create: if request.auth != null && isBrandOwnerOrAdmin(request.resource.data.brandId);
+      allow update, delete: if request.auth != null && isBrandOwnerOrAdmin(resource.data.brandId);
+    }
+
+    // Collection: brandInvites
+    match /brandInvites/{inviteId} {
+      allow read: if request.auth != null && (
+        resource.data.email == request.auth.token.email ||
+        isBrandMember(resource.data.brandId)
+      );
+      allow create: if request.auth != null && isBrandOwnerOrAdmin(request.resource.data.brandId);
+      allow update: if request.auth != null && (
+        resource.data.email == request.auth.token.email ||
+        isBrandOwnerOrAdmin(resource.data.brandId)
+      );
+      allow delete: if request.auth != null && isBrandOwnerOrAdmin(resource.data.brandId);
+    }
+
+    // Collection: projects (collections)
+    match /projects/{projectId} {
+      allow read: if request.auth != null && isBrandMember(resource.data.brandId);
+      allow create: if request.auth != null && isBrandMember(request.resource.data.brandId);
+      allow update, delete: if request.auth != null && isBrandOwnerOrAdmin(resource.data.brandId);
+    }
+
+    // Collection: products
+    match /products/{productId} {
+      allow read: if request.auth != null && isBrandMember(resource.data.brandId);
+      allow create: if request.auth != null && isBrandMember(request.resource.data.brandId);
+      allow update: if request.auth != null && isBrandMember(resource.data.brandId);
+      allow delete: if request.auth != null && isBrandOwnerOrAdmin(resource.data.brandId);
+    }
+
+    // Collection: userProfiles
+    match /userProfiles/{userId} {
+      allow read: if request.auth != null && (
+        resource.id == request.auth.uid ||
+        isBrandMember(resource.data.brandId)
+      );
+      allow create: if request.auth != null && request.resource.id == request.auth.uid;
+      allow update, delete: if request.auth != null && resource.id == request.auth.uid;
+    }
+
+    // Collection: userRewards
+    // Document ID format: {userId}_{brandId}
+    match /userRewards/{docId} {
+      // Read: user can read their own rewards, OR brand admins can read any member's rewards
+      allow read: if request.auth != null && (
+        getUserIdFromDocId(docId) == request.auth.uid ||
+        isBrandOwnerOrAdmin(getBrandIdFromDocId(docId))
+      );
+      
+      // Create: user can create their own rewards document (on first action)
+      allow create: if request.auth != null && 
+        getUserIdFromDocId(docId) == request.auth.uid &&
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.brandId == getBrandIdFromDocId(docId);
+      
+      // Update: user can update their own rewards document
+      // Note: In production, consider moving point-awarding to cloud functions for security
+      allow update: if request.auth != null && 
+        getUserIdFromDocId(docId) == request.auth.uid &&
+        // Ensure userId and brandId don't change
+        resource.data.userId == request.auth.uid &&
+        request.resource.data.userId == request.auth.uid &&
+        resource.data.brandId == request.resource.data.brandId;
+      
+      // Delete: not allowed (preserve reward history)
+      allow delete: if false;
+      
+      // Subcollection: transactions
+      match /transactions/{transactionId} {
+        // Read: user can read their own transactions
+        allow read: if request.auth != null && 
+          getUserIdFromDocId(docId) == request.auth.uid;
+        
+        // Create: user can create their own transactions (MVP)
+        // Note: In production, consider moving to cloud functions
+        allow create: if request.auth != null && 
+          getUserIdFromDocId(docId) == request.auth.uid &&
+          request.resource.data.userId == request.auth.uid &&
+          request.resource.data.brandId == getBrandIdFromDocId(docId);
+        
+        // Update/Delete: never allowed (audit trail)
+        allow update, delete: if false;
+      }
+    }
+  }
+}

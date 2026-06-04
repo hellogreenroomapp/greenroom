@@ -1,0 +1,35 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Product images: brands/{brandId}/products/{productId}/{filename}
+    match /brands/{brandId}/products/{productId}/{allPaths=**} {
+      allow read, write: if isAuthenticated();
+    }
+    
+    // Moodboard images: brands/{brandId}/moodboards/{projectId}/{imageId}
+    match /brands/{brandId}/moodboards/{projectId}/{allPaths=**} {
+      allow read, write: if isAuthenticated();
+    }
+    
+    // Shot list inspiration images: brands/{brandId}/projects/{projectId}/shotlist/inspiration/{filename}
+    match /brands/{brandId}/projects/{projectId}/shotlist/{allPaths=**} {
+      allow read, write: if isAuthenticated();
+    }
+    
+    // User avatars: users/{userId}/avatar.{ext}
+    match /users/{userId}/{allPaths=**} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Default: deny all other access
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
