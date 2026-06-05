@@ -1,5 +1,59 @@
 import { Timestamp } from 'firebase/firestore'
 
+import type { SavedMarketingStory } from '@/types/marketingSavedStories'
+
+/** Per-brand marketing integrations and sync preferences (tokens live server-side when wired). */
+export interface BrandMarketingSettings {
+  /** Planned email/SMS volume — story calendar and intelligence use these targets */
+  cadenceTargets?: {
+    emailsPerMonth?: number | null
+    smsPerMonth?: number | null
+  }
+  /** User-pinned story calendar beats (preserved when cadence plan changes) */
+  savedStories?: SavedMarketingStory[]
+  klaviyo?: {
+    status: 'disconnected' | 'connected'
+    accountLabel?: string
+    pullCampaigns: boolean
+    pullSmsCampaigns: boolean
+    pullLists: boolean
+    pullSegments: boolean
+    lastSyncAt?: Timestamp
+    lastSyncCount?: number
+    lastSyncError?: string
+  }
+  shopify?: {
+    status: 'disconnected' | 'connected'
+    shopDomain?: string
+    pullPublishDates: boolean
+    pullIncomingInventory: boolean
+    pullCollectionLaunches: boolean
+    /** Planned — not synced yet */
+    pullSalesData?: boolean
+  }
+}
+
+export const DEFAULT_BRAND_MARKETING_SETTINGS: BrandMarketingSettings = {
+  cadenceTargets: {
+    emailsPerMonth: 8,
+    smsPerMonth: 4,
+  },
+  klaviyo: {
+    status: 'disconnected',
+    pullCampaigns: true,
+    pullSmsCampaigns: false,
+    pullLists: true,
+    pullSegments: true,
+  },
+  shopify: {
+    status: 'disconnected',
+    pullPublishDates: true,
+    pullIncomingInventory: true,
+    pullCollectionLaunches: true,
+    pullSalesData: true,
+  },
+}
+
 export interface Brand {
   id: string
   name: string
@@ -7,6 +61,7 @@ export interface Brand {
   logoUrl?: string
   createdAt: Timestamp
   ownerId: string
+  marketing?: BrandMarketingSettings
 }
 
 export interface MoodboardItem {

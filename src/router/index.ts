@@ -46,6 +46,12 @@ const routes: RouteRecordRaw[] = [
     meta: { requiresAuth: true, title: 'Calendar' },
   },
   {
+    path: '/marketing',
+    name: 'marketing',
+    component: () => import('@/views/MarketingView.vue'),
+    meta: { requiresAuth: true, title: 'Marketing' },
+  },
+  {
     path: '/photo-queue',
     name: 'photo-queue',
     component: () => import('@/views/PhotoQueueView.vue'),

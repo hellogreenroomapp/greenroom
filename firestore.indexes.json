@@ -1,0 +1,13 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "marketingEvents",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "brandId", "order": "ASCENDING" },
+        { "fieldPath": "scheduledAt", "order": "ASCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

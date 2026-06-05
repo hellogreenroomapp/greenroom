@@ -55,13 +55,19 @@ export const useBrandStore = defineStore('brand', () => {
       }
     } catch (error) {
       console.error('Failed to fetch brands:', error)
-      throw error
     } finally {
       loading.value = false
     }
   }
 
   async function selectBrand(brandId: string) {
+    const cached = brands.value.find((b) => b.id === brandId)
+    if (cached) {
+      currentBrand.value = cached
+      persistBrand(brandId)
+      return
+    }
+
     try {
       loading.value = true
       const brand = await getDoc<Brand>('brands', brandId)

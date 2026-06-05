@@ -70,16 +70,15 @@ const isAuthRoute = computed(() => {
          path.startsWith('/invite/')
 })
 
-// Fetch brands when user becomes authenticated
+// Fetch brands after auth is fully ready (token + profile loaded)
 watch(
-  () => authStore.isAuthenticated,
-  async (isAuthenticated) => {
-    if (isAuthenticated && authStore.userId && brandStore.brands.length === 0) {
-      try {
-        await brandStore.fetchBrands(authStore.userId)
-      } catch (error) {
-        console.error('Failed to fetch brands on auth:', error)
-      }
+  () => [authStore.loading, authStore.isAuthenticated, authStore.userId] as const,
+  async ([authLoading, isAuthenticated, userId]) => {
+    if (authLoading || !isAuthenticated || !userId || brandStore.brands.length > 0) return
+    try {
+      await brandStore.fetchBrands(userId)
+    } catch (error) {
+      console.error('Failed to fetch brands on auth:', error)
     }
   },
   { immediate: true }

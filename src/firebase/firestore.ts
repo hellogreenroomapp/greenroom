@@ -4,6 +4,7 @@ import {
   getDoc as getDocFirestore,
   getDocs as getDocsFirestore,
   addDoc as addDocFirestore,
+  setDoc as setDocFirestore,
   updateDoc as updateDocFirestore,
   deleteDoc as deleteDocFirestore,
   query,
@@ -13,8 +14,10 @@ import {
   type DocumentData,
   type Query,
 } from 'firebase/firestore'
-import { db } from './config'
+import { auth, db } from './config'
 import type { Brand, Project, Product, BrandMember, StageChange, BrandInvite, UserProfile } from '@/types'
+import type { MarketingEventRecord } from '@/types/marketingEvents'
+import type { MarketingKlaviyoInsights } from '@/types/klaviyoInsights'
 
 export async function getDoc<T extends DocumentData>(
   collectionPath: string,
@@ -90,6 +93,76 @@ export async function deleteDoc(
   }
 }
 
+export function brandMemberDocId(brandId: string, userId: string): string {
+  return `${brandId}_${userId}`
+}
+
+/** Wait for Firebase Auth token before Firestore reads (avoids permission-denied races). */
+export async function ensureFirestoreAuthReady(): Promise<void> {
+  const user = auth.currentUser
+  if (!user) throw new Error('Not authenticated')
+  await user.getIdToken()
+}
+
+/** Copy membership to canonical {brandId}_{userId} so security rules can resolve brand access. */
+export async function ensureCanonicalBrandMemberDoc(
+  member: BrandMember,
+  userId: string
+): Promise<void> {
+  if (!member.brandId) return
+  const canonicalId = brandMemberDocId(member.brandId, userId)
+  if (member.id === canonicalId) return
+
+  await setDoc<BrandMember>(
+    'brandMembers',
+    canonicalId,
+    {
+      userId: member.userId,
+      brandId: member.brandId,
+      email: member.email ?? '',
+      displayName: member.displayName ?? '',
+      role: member.role,
+      status: member.status,
+      invitedAt: member.invitedAt,
+      joinedAt: member.joinedAt ?? Timestamp.now(),
+    } as Omit<BrandMember, 'id'>,
+    true
+  )
+}
+
+export async function setDoc<T extends DocumentData>(
+  collectionPath: string,
+  docId: string,
+  data: Omit<T, 'id'>,
+  merge = false
+): Promise<void> {
+  try {
+    const docRef = doc(db, collectionPath, docId)
+    await setDocFirestore(docRef, data as DocumentData, { merge })
+  } catch (error: any) {
+    throw new Error(`Failed to set document: ${error.message}`)
+  }
+}
+
+export async function upsertActiveBrandMember(
+  brandId: string,
+  member: Omit<BrandMember, 'id' | 'brandId'> & { brandId?: string }
+): Promise<string> {
+  const docId = brandMemberDocId(brandId, member.userId)
+  await setDoc<BrandMember>(
+    'brandMembers',
+    docId,
+    {
+      ...member,
+      brandId,
+      status: 'active',
+      joinedAt: member.joinedAt ?? Timestamp.now(),
+    } as Omit<BrandMember, 'id'>,
+    true
+  )
+  return docId
+}
+
 export async function createBrand(
   data: Omit<Brand, 'id' | 'createdAt'>
 ): Promise<string> {
@@ -105,31 +178,58 @@ export async function createBrand(
     }
   })
   
-  return await addDoc<Brand>('brands', cleanData as unknown as Omit<Brand, 'id'>)
+  const brandId = await addDoc<Brand>('brands', cleanData as unknown as Omit<Brand, 'id'>)
+
+  // Owner must be an active member for security rules (products, projects, etc.)
+  await upsertActiveBrandMember(brandId, {
+    userId: data.ownerId,
+    email: '',
+    displayName: '',
+    role: 'owner',
+    invitedAt: Timestamp.now(),
+    status: 'active',
+    joinedAt: Timestamp.now(),
+  })
+
+  return brandId
 }
 
 export async function getBrandsByUser(userId: string): Promise<{ owned: Brand[]; invited: Brand[] }> {
-  // Fetch brands where user is owner
-  const ownedBrands = await getDocs<Brand>('brands', [where('ownerId', '==', userId)])
-  
-  // Fetch brands where user is a member
-  const memberships = await getDocs<BrandMember>('brandMembers', [
-    where('userId', '==', userId),
-    where('status', '==', 'active'),
-  ])
-  
-  // Get brand details for each membership
+  await ensureFirestoreAuthReady()
+
+  let ownedBrands: Brand[] = []
+  try {
+    ownedBrands = await getDocs<Brand>('brands', [where('ownerId', '==', userId)])
+  } catch (error) {
+    console.error('[firestore] Failed to query owned brands', error)
+  }
+
+  let memberships: BrandMember[] = []
+  try {
+    memberships = await getDocs<BrandMember>('brandMembers', [
+      where('userId', '==', userId),
+      where('status', '==', 'active'),
+    ])
+  } catch (error) {
+    console.error('[firestore] Failed to query brand memberships', error)
+  }
+
   const invitedBrands: Brand[] = []
   for (const membership of memberships) {
-    // Skip if user is also the owner (already in ownedBrands)
-    if (!ownedBrands.find(b => b.id === membership.brandId)) {
+    if (!membership.brandId || ownedBrands.some((b) => b.id === membership.brandId)) continue
+
+    try {
+      await ensureCanonicalBrandMemberDoc(membership, userId)
       const brand = await getDoc<Brand>('brands', membership.brandId)
-      if (brand) {
-        invitedBrands.push(brand)
-      }
+      if (brand) invitedBrands.push(brand)
+    } catch (error) {
+      console.warn(
+        `[firestore] Skipping brand ${membership.brandId} — read denied or missing`,
+        error
+      )
     }
   }
-  
+
   return { owned: ownedBrands, invited: invitedBrands }
 }
 
@@ -308,8 +408,7 @@ export async function acceptInvite(token: string, userId: string): Promise<void>
       return
     }
 
-    await addDoc<BrandMember>('brandMembers', {
-      brandId: invite.brandId,
+    await upsertActiveBrandMember(invite.brandId, {
       userId,
       email: invite.email,
       displayName: userProfile.displayName,
@@ -317,7 +416,7 @@ export async function acceptInvite(token: string, userId: string): Promise<void>
       invitedAt: invite.createdAt,
       joinedAt: Timestamp.now(),
       status: 'active',
-    } as Omit<BrandMember, 'id'>)
+    })
 
     await updateDoc<BrandInvite>('brandInvites', token, { status: 'accepted' })
   } catch (error: any) {
@@ -375,4 +474,30 @@ export function stripUndefinedDeep<T>(value: T): T {
     }
   }
   return out as T
+}
+
+export async function getKlaviyoInsights(
+  brandId: string
+): Promise<MarketingKlaviyoInsights | null> {
+  return getDoc<MarketingKlaviyoInsights>('marketingKlaviyoInsights', brandId)
+}
+
+export async function getMarketingEventsByBrand(brandId: string): Promise<MarketingEventRecord[]> {
+  try {
+    return await getDocs<MarketingEventRecord>('marketingEvents', [
+      where('brandId', '==', brandId),
+      orderBy('scheduledAt', 'asc'),
+    ])
+  } catch (error: unknown) {
+    const err = error as { message?: string; code?: string }
+    if (err.message?.includes('index') || err.code === 'failed-precondition') {
+      const events = await getDocs<MarketingEventRecord>('marketingEvents', [
+        where('brandId', '==', brandId),
+      ])
+      return events.sort(
+        (a, b) => (a.scheduledAt?.toMillis?.() || 0) - (b.scheduledAt?.toMillis?.() || 0)
+      )
+    }
+    throw error
+  }
 }

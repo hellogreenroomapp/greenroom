@@ -934,7 +934,6 @@ export function generateWeekViewPDF(weeks: WeekData[], monthYear: string) {
     // This shouldn't happen due to our page break logic, but if it does,
     // the content is already drawn and jsPDF will handle it
   }
-
   // Save the PDF
   const fileName = `Weekly-Launch-Report-${monthYear.replace(/\s+/g, '-')}.pdf`
   doc.save(fileName)

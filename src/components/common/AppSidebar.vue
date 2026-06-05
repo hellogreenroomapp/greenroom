@@ -71,6 +71,7 @@ const navLinks = [
   { name: 'dashboard', label: 'Dashboard', to: '/dashboard' },
   { name: 'pipeline', label: 'Pipeline', to: '/pipeline' },
   { name: 'calendar', label: 'Calendar', to: '/calendar' },
+  { name: 'marketing', label: 'Marketing', to: '/marketing', badge: 'NEW' },
   { name: 'photo-queue', label: 'Photo Queue', to: '/photo-queue' },
   { name: 'projects', label: 'Collections', to: '/projects' },
   { name: 'catalogue', label: 'Catalogue', to: '/catalogue' },

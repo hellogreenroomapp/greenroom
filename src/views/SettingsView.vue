@@ -399,6 +399,7 @@
     <div class="bg-card border border-border rounded-lg p-6">
       <RewardsSettings />
     </div>
+
   </div>
 </template>
 

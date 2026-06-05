@@ -31,9 +31,7 @@ export function useProducts() {
     loading.value = true
     error.value = null
     try {
-      console.log('Fetching products for brandId:', brandId)
       let allProducts = await getProductsByBrand(brandId)
-      console.log('Fetched products:', allProducts.length, allProducts)
 
       if (filters) {
         if (filters.unassignedOnly) {
@@ -62,9 +60,9 @@ export function useProducts() {
 
       products.value = allProducts
       return allProducts
-    } catch (err: any) {
-      console.error('Error fetching products:', err)
-      error.value = err.message || 'Failed to fetch products'
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to fetch products'
+      error.value = message
       products.value = []
       return []
     } finally {

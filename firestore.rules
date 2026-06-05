@@ -2,17 +2,56 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Helper function to check if user is a brand member
+    function brandMemberDocId(brandId) {
+      return brandId + '_' + request.auth.uid;
+    }
+
+    // Legacy member doc id: {userId}_{brandId}
+    function legacyBrandMemberDocId(brandId) {
+      return request.auth.uid + '_' + brandId;
+    }
+
+    function isBrandOwner(brandId) {
+      return request.auth != null &&
+        get(/databases/$(database)/documents/brands/$(brandId)).data.ownerId == request.auth.uid;
+    }
+
+    function activeBrandMemberRecord(memberId, brandId) {
+      let path = /databases/$(database)/documents/brandMembers/$(memberId);
+      return exists(path) &&
+        get(path).data.userId == request.auth.uid &&
+        get(path).data.brandId == brandId &&
+        get(path).data.status == 'active';
+    }
+
+    // Active brand member — canonical {brandId}_{userId} or legacy {userId}_{brandId}
+    function hasActiveMembership(brandId) {
+      return activeBrandMemberRecord(brandMemberDocId(brandId), brandId) ||
+        activeBrandMemberRecord(legacyBrandMemberDocId(brandId), brandId);
+    }
+
     function isBrandMember(brandId) {
-      return request.auth != null && 
-             exists(/databases/$(database)/documents/brandMembers/$(brandId + '_' + request.auth.uid));
+      return request.auth != null && (
+        isBrandOwner(brandId) || hasActiveMembership(brandId)
+      );
     }
     
-    // Helper function to check if user is brand owner or admin
     function isBrandOwnerOrAdmin(brandId) {
       return request.auth != null && (
-        get(/databases/$(database)/documents/brands/$(brandId)).data.ownerId == request.auth.uid ||
-        get(/databases/$(database)/documents/brandMembers/$(brandId + '_' + request.auth.uid)).data.role in ['owner', 'admin']
+        isBrandOwner(brandId) ||
+        (
+          hasActiveMembership(brandId) &&
+          (
+            (
+              activeBrandMemberRecord(brandMemberDocId(brandId), brandId) &&
+              get(/databases/$(database)/documents/brandMembers/$(brandMemberDocId(brandId))).data.role in ['owner', 'admin']
+            ) ||
+            (
+              activeBrandMemberRecord(legacyBrandMemberDocId(brandId), brandId) &&
+              get(/databases/$(database)/documents/brandMembers/$(legacyBrandMemberDocId(brandId))).data.role in ['owner', 'admin']
+            )
+          )
+        )
       );
     }
     
@@ -37,14 +76,31 @@ service cloud.firestore {
       allow delete: if request.auth != null && resource.data.ownerId == request.auth.uid;
     }
 
-    // Collection: brandMembers
+    // Collection: brandMembers (preferred doc id: {brandId}_{userId})
     match /brandMembers/{memberId} {
       allow read: if request.auth != null && (
         resource.data.userId == request.auth.uid ||
+        isBrandOwner(resource.data.brandId) ||
         isBrandMember(resource.data.brandId)
       );
-      allow create: if request.auth != null && isBrandOwnerOrAdmin(request.resource.data.brandId);
-      allow update, delete: if request.auth != null && isBrandOwnerOrAdmin(resource.data.brandId);
+      allow create: if request.auth != null && (
+        isBrandOwnerOrAdmin(request.resource.data.brandId) ||
+        (
+          request.resource.data.userId == request.auth.uid &&
+          memberId == brandMemberDocId(request.resource.data.brandId) &&
+          request.resource.data.status == 'active'
+        )
+      );
+      allow update: if request.auth != null && (
+        isBrandOwnerOrAdmin(resource.data.brandId) ||
+        (
+          resource.data.userId == request.auth.uid &&
+          request.resource.data.userId == request.auth.uid &&
+          request.resource.data.brandId == resource.data.brandId &&
+          request.resource.data.status == 'active'
+        )
+      );
+      allow delete: if request.auth != null && isBrandOwnerOrAdmin(resource.data.brandId);
     }
 
     // Collection: brandInvites
@@ -80,19 +136,46 @@ service cloud.firestore {
     match /userProfiles/{userId} {
       allow read: if request.auth != null && (
         resource.id == request.auth.uid ||
-        isBrandMember(resource.data.brandId)
+        (resource.data.keys().hasAny(['brandId']) && isBrandMember(resource.data.brandId))
       );
       allow create: if request.auth != null && request.resource.id == request.auth.uid;
       allow update, delete: if request.auth != null && resource.id == request.auth.uid;
     }
 
+    // GreenRoom platform keys (Klaviyo client secret) — Cloud Functions only
+    match /platformConfig/{docId} {
+      allow read, write: if false;
+    }
+
+    // OAuth PKCE state — server (Cloud Functions) only
+    match /oauthStates/{stateId} {
+      allow read, write: if false;
+    }
+
+    // Integration tokens — server only
+    match /brandIntegrationSecrets/{docId} {
+      allow read, write: if false;
+    }
+
+    // Synced marketing calendar rows (Klaviyo, Shopify, etc.)
+    match /marketingEvents/{eventId} {
+      allow read: if request.auth != null && isBrandMember(resource.data.brandId);
+      allow write: if false;
+    }
+
+    // Klaviyo audience + cadence snapshot (read-only sync)
+    match /marketingKlaviyoInsights/{brandId} {
+      allow read: if request.auth != null && isBrandMember(brandId);
+      allow write: if false;
+    }
+
     // Collection: userRewards
     // Document ID format: {userId}_{brandId}
     match /userRewards/{docId} {
-      // Read: user can read their own rewards, OR brand admins can read any member's rewards
+      // Read: own rewards, or any active member of the brand (leaderboard, team visibility)
       allow read: if request.auth != null && (
         getUserIdFromDocId(docId) == request.auth.uid ||
-        isBrandOwnerOrAdmin(getBrandIdFromDocId(docId))
+        isBrandMember(getBrandIdFromDocId(docId))
       );
       
       // Create: user can create their own rewards document (on first action)

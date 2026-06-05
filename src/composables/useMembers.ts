@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import { getBrandMembers, getDocs, addDoc, updateDoc } from '@/firebase/firestore'
+import { getBrandMembers, getDocs, setDoc, updateDoc, brandMemberDocId } from '@/firebase/firestore'
 import { where } from 'firebase/firestore'
 import type { BrandMember } from '@/types'
 
@@ -43,11 +43,17 @@ export function useMembers() {
     error.value = null
     try {
       const { Timestamp } = await import('firebase/firestore')
-      return await addDoc<BrandMember>('brandMembers', {
-        ...data,
-        status: 'pending',
-        invitedAt: Timestamp.now(),
-      } as unknown as Omit<BrandMember, 'id'>)
+      const docId = brandMemberDocId(data.brandId, data.userId)
+      await setDoc<BrandMember>(
+        'brandMembers',
+        docId,
+        {
+          ...data,
+          status: 'pending',
+          invitedAt: Timestamp.now(),
+        } as unknown as Omit<BrandMember, 'id'>
+      )
+      return docId
     } catch (err: any) {
       error.value = err.message
       throw err
