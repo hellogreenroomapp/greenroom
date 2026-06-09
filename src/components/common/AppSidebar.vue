@@ -60,14 +60,23 @@
 import { computed } from 'vue'
 import BrandSelector from '@/components/brand/BrandSelector.vue'
 import { useUIStore } from '@/stores/ui'
+import { useBrandStore } from '@/stores/brand'
+import { getRetentionReports } from '@/constants/retentionReports'
 import greenroomIcon from '@/assets/greenroom_icon.svg'
 import greenroomLogo from '@/assets/greenroom.svg'
 
 const uiStore = useUIStore()
+const brandStore = useBrandStore()
 
 const isOpen = computed(() => uiStore.sidebarOpen)
 
-const navLinks = [
+const hasRetentionReports = computed(
+  () =>
+    !!getRetentionReports(brandStore.currentBrand?.name, brandStore.currentBrand?.slug) ||
+    (brandStore.currentBrand?.retentionReports?.length ?? 0) > 0
+)
+
+const navLinks = computed(() => [
   { name: 'dashboard', label: 'Dashboard', to: '/dashboard' },
   { name: 'pipeline', label: 'Pipeline', to: '/pipeline' },
   { name: 'calendar', label: 'Calendar', to: '/calendar' },
@@ -76,8 +85,11 @@ const navLinks = [
   { name: 'projects', label: 'Collections', to: '/projects' },
   { name: 'catalogue', label: 'Catalogue', to: '/catalogue' },
   { name: 'launch-report', label: 'Report', to: '/reports/launch', badge: 'NEW' },
+  ...(hasRetentionReports.value
+    ? [{ name: 'retention-reports', label: 'Retention', to: '/reports/retention', badge: 'NEW' }]
+    : []),
   { name: 'settings', label: 'Settings', to: '/settings' },
-]
+])
 </script>
 
 <style scoped>

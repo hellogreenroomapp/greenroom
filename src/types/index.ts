@@ -1,6 +1,7 @@
 import { Timestamp } from 'firebase/firestore'
 
 import type { SavedMarketingStory } from '@/types/marketingSavedStories'
+import type { RetentionReport } from '@/constants/retentionReports'
 
 /** Per-brand marketing integrations and sync preferences (tokens live server-side when wired). */
 export interface BrandMarketingSettings {
@@ -62,6 +63,10 @@ export interface Brand {
   createdAt: Timestamp
   ownerId: string
   marketing?: BrandMarketingSettings
+  /** Retention report cards added from the Retention Reports page */
+  retentionReports?: RetentionReport[]
+  /** SHA-256 hash gating the Retention Reports section (empty/absent = no password) */
+  retentionPasswordHash?: string
 }
 
 export interface MoodboardItem {

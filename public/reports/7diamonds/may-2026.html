@@ -1,0 +1,892 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>7Diamonds — May 2026 Klaviyo Performance</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#f7f7f8; --card:#ffffff; --ink:#1f2430; --muted:#6b7280; --faint:#9ca3af;
+    --line:#e8e9ec; --line2:#f0f1f3; --email:#3b4252; --sms:#9aa3b2; --pos:#3f7d62; --neg:#b06a6a;
+    --accent:#2f3645;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1120px;margin:0 auto;padding:40px 28px 80px}
+  header.top{border-bottom:1px solid var(--line);padding-bottom:22px;margin-bottom:30px}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin:0 0 6px}
+  h1{font-size:27px;font-weight:600;margin:0 0 6px;letter-spacing:-.01em}
+  .sub{color:var(--muted);font-size:14px;margin:0}
+  section{margin:46px 0 0}
+  .sec-head{display:flex;align-items:baseline;gap:12px;border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:22px}
+  h2{font-size:19px;font-weight:600;margin:0;letter-spacing:-.01em}
+  .sec-head .tag{font-size:12px;color:var(--faint)}
+  h3{font-size:14px;font-weight:600;margin:0 0 14px;color:var(--accent)}
+  p{margin:0 0 12px;color:#374151}
+  .grid{display:grid;gap:16px}
+  .kpis{grid-template-columns:repeat(4,1fr)}
+  .k2{grid-template-columns:repeat(2,1fr)}
+  .k3{grid-template-columns:repeat(3,1fr)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+  .kpi .label{font-size:12px;color:var(--muted);margin:0 0 8px;letter-spacing:.02em}
+  .kpi .val{font-size:25px;font-weight:600;letter-spacing:-.02em;margin:0}
+  .kpi .meta{font-size:12px;color:var(--faint);margin:6px 0 0}
+  .chartbox{position:relative;height:300px}
+  .chartbox.sm{height:260px}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th,td{text-align:right;padding:9px 10px;border-bottom:1px solid var(--line2)}
+  th:first-child,td:first-child{text-align:left}
+  thead th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--faint);font-weight:600;border-bottom:1px solid var(--line)}
+  tbody tr:hover{background:#fafafb}
+  td.name{font-weight:500;color:var(--ink)}
+  td.name .c-subj{font-style:italic;font-weight:400;color:var(--muted);font-size:11.5px;margin-top:3px;line-height:1.35}
+  td.c-date{white-space:nowrap;line-height:1.25}
+  td.c-date .d1{font-weight:600;color:var(--ink);font-size:12.5px}
+  td.c-date .d2{font-size:10.5px;color:var(--faint);margin-top:1px}
+  td .c-rpr{font-size:10.5px;color:var(--faint);font-weight:400;margin-top:2px}
+  td.u{color:var(--neg);font-weight:500}
+  .pill{display:inline-block;font-size:10.5px;padding:2px 8px;border-radius:20px;border:1px solid var(--line);color:var(--muted);background:#fbfbfc}
+  .pill.email{color:#3b4252;border-color:#d7dbe2}
+  .pill.sms{color:#5b6577;border-color:#dfe3ea}
+  .takeaway{background:#fbfbfc;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;padding:14px 18px;margin-top:18px}
+  .takeaway h4{margin:0 0 8px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .takeaway ul{margin:0;padding-left:18px}
+  .takeaway li{margin:5px 0;color:#374151;font-size:13.5px}
+  .pos{color:var(--pos);font-weight:600}.neg{color:var(--neg);font-weight:600}
+  .note{font-size:12px;color:var(--faint);margin-top:10px;font-style:italic}
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+  .footer{margin-top:60px;border-top:1px solid var(--line);padding-top:18px;font-size:12px;color:var(--faint)}
+  @media(max-width:840px){.kpis,.k3{grid-template-columns:repeat(2,1fr)}.split,.k2{grid-template-columns:1fr}}
+  /* Tabs */
+  .tabs{display:flex;gap:4px;margin:22px 0 0;border-bottom:1px solid var(--line)}
+  .tab{appearance:none;background:none;border:none;font:inherit;font-size:14px;font-weight:500;color:var(--muted);
+    padding:11px 18px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;letter-spacing:.01em}
+  .tab:hover{color:var(--ink)}
+  .tab.active{color:var(--ink);border-bottom-color:var(--accent);font-weight:600}
+  .tabpanel{display:none}
+  .tabpanel.active{display:block}
+  /* Compare toggle */
+  .cmp-bar{display:flex;align-items:center;gap:11px;margin:26px 0 -8px;flex-wrap:wrap}
+  .cmp-bar .cmp-title{font-size:13px;color:var(--muted);font-weight:500}
+  .cmp-seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff}
+  .cmp-seg button{appearance:none;background:#fff;border:none;font:inherit;font-size:12.5px;padding:6px 15px;cursor:pointer;color:var(--muted);border-right:1px solid var(--line)}
+  .cmp-seg button:last-child{border-right:none}
+  .cmp-seg button:hover{color:var(--ink)}
+  .cmp-seg button.active{background:var(--accent);color:#fff;font-weight:600}
+  .cmp-note{font-size:11.5px;color:var(--faint)}
+  .kpi-delta{display:none;font-size:12px;font-weight:600;margin:6px 0 0}
+  .kpi-delta.show{display:block}
+  .kpi-delta.up{color:var(--pos)}.kpi-delta.down{color:var(--neg)}
+  .kpi-delta .vs{color:var(--faint);font-weight:400}
+  /* Creative cards */
+  .cr-group{margin-top:14px}
+  .cr-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:16px}
+  .cr-grid.bottom{grid-template-columns:repeat(3,1fr)}
+  .cr-card{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+  .cr-card.lose{border-color:#ecdada}
+  .cr-rankbar{display:flex;align-items:center;justify-content:space-between;padding:9px 13px;border-bottom:1px solid var(--line2);font-size:12px}
+  .cr-rank{font-weight:600;color:var(--accent)}
+  .cr-rev{font-weight:600;color:var(--pos)}
+  .cr-rev.lose{color:var(--neg)}
+  .cr-thumb{position:relative;background:#f0f1f3;aspect-ratio:65/72;overflow:hidden;border-bottom:1px solid var(--line2)}
+  .cr-thumb img{width:100%;height:100%;object-fit:cover;object-position:top center;display:block}
+  .cr-fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--faint);font-size:12px;text-align:center;padding:16px;z-index:0}
+  .cr-thumb img{position:relative;z-index:1}
+  .cr-body{padding:13px 15px 16px;display:flex;flex-direction:column;gap:9px;flex:1}
+  .cr-name{font-size:13px;font-weight:600;color:var(--ink);margin:0}
+  .cr-field{font-size:12px;line-height:1.4}
+  .cr-field .lbl{display:block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-bottom:2px}
+  .cr-field .subj{color:var(--ink);font-weight:500}
+  .cr-field .prev{color:var(--muted)}
+  .cr-eval{background:#fafafb;border:1px solid var(--line2);border-radius:8px;padding:8px 10px;display:flex;flex-direction:column;gap:6px}
+  .cr-eval p{margin:0;font-size:11px;line-height:1.4;color:#4b5563}
+  .cr-eval .ok{color:var(--pos);font-weight:600;white-space:nowrap}
+  .cr-eval .watch{color:#a9762f;font-weight:600;white-space:nowrap}
+  .cr-metrics{display:flex;gap:0;margin-top:auto;border-top:1px solid var(--line2);padding-top:10px}
+  .cr-metric{flex:1;text-align:center;border-right:1px solid var(--line2);padding:0 1px}
+  .cr-metric:last-child{border-right:none}
+  .cr-metric .m-val{font-size:12.5px;font-weight:600;color:var(--ink)}
+  .cr-metric .m-lbl{font-size:8.5px;letter-spacing:.03em;text-transform:uppercase;color:var(--faint);margin-top:1px}
+  .cr-subhead{font-size:13px;font-weight:600;color:var(--accent);margin:26px 0 0;display:flex;align-items:center;gap:8px}
+  .cr-subhead .dot{width:7px;height:7px;border-radius:50%;background:var(--pos)}
+  .cr-subhead.lose .dot{background:var(--neg)}
+  /* Hero feature (best creative) */
+  .hero-feature{display:flex;gap:24px;align-items:stretch;margin-top:8px}
+  .hf-visual{flex:0 0 340px;display:flex;flex-direction:column}
+  .hf-badge{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#8a6d1f;background:#fbf4dd;border:1px solid #efe2b4;border-radius:20px;padding:5px 11px;margin-bottom:8px}
+  .hf-meta{font-size:12.5px;color:var(--muted);margin-bottom:10px}
+  .hf-meta strong{color:var(--ink)}
+  .hf-frame{position:relative;flex:1;min-height:480px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 6px 22px rgba(31,36,48,.07)}
+  .hf-scroll{position:absolute;inset:0;overflow-y:auto;scrollbar-width:thin}
+  .hf-scroll img{width:100%;display:block}
+  .hf-hint{position:absolute;left:0;right:0;bottom:0;text-align:center;font-size:10.5px;color:var(--faint);background:linear-gradient(transparent,#fff 60%);padding:14px 0 6px;pointer-events:none}
+  .hf-copy{flex:1;min-width:0}
+  .hf-copy > p:first-of-type{margin-top:0}
+  @media(max-width:820px){.hero-feature{flex-direction:column}.hf-visual{flex:none;position:static;max-height:none;width:100%}.hf-frame{min-height:0}.hf-scroll{position:static;max-height:560px}}
+  /* SMS phone mockups */
+  .sms-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:26px 20px;margin-top:20px;justify-items:center}
+  .sms-card{width:100%;max-width:262px;display:flex;flex-direction:column;align-items:center}
+  .sms-toprev{font-size:18px;font-weight:600;color:var(--ink)}
+  .sms-toprev .badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#8a6d1f;background:#fbf4dd;border:1px solid #efe2b4;border-radius:20px;padding:2px 8px;margin-left:6px;vertical-align:middle}
+  .sms-cname{font-size:12.5px;color:var(--muted);margin:2px 0 12px;text-align:center}
+  .phone{width:100%;background:#1f2430;border-radius:34px;padding:9px;box-shadow:0 12px 30px rgba(31,36,48,.16)}
+  .phone .screen{background:#fff;border-radius:27px;overflow:hidden;display:flex;flex-direction:column;min-height:300px}
+  .phone .bar{position:relative;height:34px;background:#f3f4f6;border-bottom:1px solid var(--line2);display:flex;align-items:center;justify-content:center}
+  .phone .bar .notch{position:absolute;top:9px;left:50%;transform:translateX(-50%);width:42px;height:5px;background:#cfd2d8;border-radius:3px}
+  .phone .from{font-size:11px;font-weight:600;color:var(--muted);padding:9px 0 4px;text-align:center}
+  .phone .thread{padding:6px 12px 16px;display:flex;flex-direction:column;gap:8px;flex:1}
+  .bubble{background:#e9eaed;border-radius:18px;border-bottom-left-radius:5px;align-self:flex-start;max-width:92%;overflow:hidden}
+  .bubble img{width:100%;display:block}
+  .bubble .txt{padding:9px 12px;font-size:12px;line-height:1.42;color:#101114;white-space:pre-line}
+  .bubble .lnk{color:#2f6bd6;word-break:break-all}
+  .bubble .optout{display:block;color:#9aa0a8;font-size:10px;margin-top:6px}
+  .sms-metrics{display:flex;width:100%;margin-top:14px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+  .sms-metric{flex:1;text-align:center;padding:9px 3px;border-right:1px solid var(--line2)}
+  .sms-metric:last-child{border-right:none}
+  .sms-metric .v{font-weight:600;font-size:14px;color:var(--ink)}
+  .sms-metric .v.neg{color:var(--neg)}
+  .sms-metric .l{font-size:9px;color:var(--faint);text-transform:uppercase;letter-spacing:.04em;margin-top:1px}
+  .sms-foot{font-size:11px;color:var(--faint);margin-top:8px;text-align:center}
+  @media(max-width:780px){.sms-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media(max-width:520px){.sms-grid{grid-template-columns:1fr}}
+  @media(max-width:840px){.cr-grid,.cr-grid.bottom{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:560px){.cr-grid,.cr-grid.bottom{grid-template-columns:1fr}}
+  .cr-card{cursor:pointer;transition:box-shadow .15s,transform .15s}
+  .cr-card:hover{box-shadow:0 6px 22px rgba(31,36,48,.10);transform:translateY(-2px)}
+  .cr-view{position:absolute;bottom:10px;right:11px;font-size:10.5px;color:var(--faint);display:flex;align-items:center;gap:4px;z-index:2;background:rgba(255,255,255,.82);padding:3px 7px;border-radius:20px}
+  /* Lightbox */
+  .lb{position:fixed;inset:0;background:rgba(20,22,28,.62);z-index:1000;display:none;align-items:flex-start;justify-content:center;overflow-y:auto;padding:40px 16px}
+  .lb.open{display:flex}
+  .lb-inner{background:#fff;border-radius:14px;max-width:560px;width:100%;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.3);margin:auto}
+  .lb-head{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--line);padding:15px 20px;display:flex;justify-content:space-between;align-items:flex-start;gap:14px;z-index:3}
+  .lb-head h3{font-size:15px;margin:0 0 4px}
+  .lb-head .meta{font-size:12px;color:var(--muted);margin:0}
+  .lb-head .meta b{color:var(--ink);font-weight:600}
+  .lb-close{appearance:none;border:1px solid var(--line);background:#fff;border-radius:8px;width:32px;height:32px;font-size:18px;line-height:1;cursor:pointer;color:var(--muted);flex:none}
+  .lb-close:hover{background:#f5f5f6;color:var(--ink)}
+  .lb-stats{display:flex;gap:0;border-bottom:1px solid var(--line);background:#fafbfc}
+  .lb-stat{flex:1;text-align:center;padding:10px 4px;border-right:1px solid var(--line)}
+  .lb-stat:last-child{border-right:none}
+  .lb-stat .v{font-size:15px;font-weight:600}.lb-stat .l{font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--faint)}
+  .lb-scroll{max-height:none}
+  .lb-scroll img{width:100%;display:block}
+  .lb-note{font-size:11px;color:var(--faint);text-align:center;padding:12px 16px;font-style:italic}
+  /* Health Report */
+  .hs-hero{display:flex;flex-direction:column;align-items:center;text-align:center;padding:34px 24px 30px}
+  .hs-hero .band{font-size:19px;font-weight:600;margin:14px 0 4px}
+  .hs-hero .sub{font-size:13.5px;color:var(--muted);max-width:440px;margin:0}
+  .hs-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:16px}
+  .hs-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 18px}
+  .hs-card .ring-wrap{display:flex;justify-content:center}
+  .hs-card .hs-title{text-align:center;font-size:13.5px;font-weight:600;color:var(--ink);margin:8px 0 12px}
+  .hs-rows{font-size:12.5px}
+  .hs-rows .r{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--line2)}
+  .hs-rows .r:last-child{border-bottom:none}
+  .hs-rows .r .k{color:var(--muted)}
+  .hs-rows .r .v{font-weight:600;color:var(--ink)}
+  .hs-rows .r .v.ok{color:var(--pos)}.hs-rows .r .v.warn{color:#b07d24}
+  .hs-bm{font-size:10.5px;color:var(--faint);margin-top:10px;line-height:1.4}
+  .hs-read{font-size:11.5px;color:#4b5563;margin-top:8px;line-height:1.4}
+  .hs-contrib .row{display:flex;align-items:center;gap:14px;padding:13px 0;border-bottom:1px solid var(--line2)}
+  .hs-contrib .row:last-child{border-bottom:none}
+  .hs-contrib .ic{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex:none}
+  .hs-contrib .lbl{flex:1}.hs-contrib .lbl .t{font-weight:600;font-size:14px}.hs-contrib .lbl .d{font-size:12px;color:var(--muted)}
+  .hs-contrib .val{text-align:right}.hs-contrib .val .t{font-weight:600;font-size:16px}.hs-contrib .val .d{font-size:12px;color:var(--pos)}
+  @media(max-width:720px){.hs-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <p style="margin:0 0 14px"><a href="index.html" style="font-size:13px;color:var(--muted);text-decoration:none;font-weight:500">← All 7Diamonds reports</a></p>
+  <p class="eyebrow">7Diamonds · Klaviyo Performance Report</p>
+  <h1>May 2026 Monthly Review</h1>
+  <p class="sub">Email &amp; SMS · Campaigns, Flows &amp; Subscriber Growth · Reporting window May 1–31, 2026 · Conversion metric: Placed Order (Shopify) · Currency USD</p>
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('perf',this)">Performance Dashboard</button>
+    <button class="tab" onclick="showTab('creative',this)">Creative Report</button>
+    <button class="tab" onclick="showTab('health',this)">Health Report</button>
+  </div>
+</header>
+
+<div id="tab-perf" class="tabpanel active">
+
+<div class="cmp-bar">
+  <span class="cmp-title">Compare revenue:</span>
+  <div class="cmp-seg">
+    <button class="active" onclick="setCmp('off',this)">Off</button>
+    <button onclick="setCmp('mom',this)">MoM</button>
+    <button onclick="setCmp('yoy',this)">YoY</button>
+  </div>
+  <span class="cmp-note" id="cmp-note">Toggle to show revenue deltas on the cards below</span>
+</div>
+
+<!-- ============ EXECUTIVE SUMMARY ============ -->
+<section>
+  <div class="sec-head"><h2>At a Glance</h2><span class="tag">Total attributed revenue across all sends</span></div>
+  <div class="grid kpis">
+    <div class="card kpi"><p class="label">Total attributed revenue</p><p class="val">$337.7K</p><p class="meta">Campaigns + flows, email &amp; SMS</p><p class="kpi-delta" data-mom="-8.5" data-yoy="14.0"></p></div>
+    <div class="card kpi"><p class="label">Campaign revenue</p><p class="val">$147.9K</p><p class="meta">40 sends · 1.73M recipients</p><p class="kpi-delta" data-mom="-17.1" data-yoy="-33.3"></p></div>
+    <div class="card kpi"><p class="label">Flow revenue</p><p class="val">$189.7K</p><p class="meta">20 active messages · always-on</p><p class="kpi-delta" data-mom="-0.5" data-yoy="155.3"></p></div>
+    <div class="card kpi"><p class="label">Net list growth</p><p class="val pos">+1,399</p><p class="meta">Email +1,212 · SMS +187</p></div>
+  </div>
+  <p style="margin-top:20px">May was a high-cadence month built around two pillars: a <strong>Mother's Day full-list push</strong> in the first week and a steady drumbeat of <strong>men's product-category drops</strong> (seersucker, linen, pants, swim, denim, polos, pullovers) through the rest of the month. Flows quietly out-earned campaigns, generating <strong>56% of total attributed revenue</strong> from just 38K recipients — a reminder that automated, high-intent touchpoints remain the most efficient revenue per send. Campaign volume was heavy (1.73M total recipients) but broadcast-style, so revenue-per-recipient stayed low while reach and top-of-funnel engagement stayed strong.</p>
+  <div class="split" style="margin-top:8px">
+    <div class="card"><h3>Revenue mix — Campaigns vs Flows</h3><div class="chartbox sm"><canvas id="mixChart"></canvas></div></div>
+    <div class="card"><h3>Revenue by channel</h3><div class="chartbox sm"><canvas id="chanChart"></canvas></div></div>
+  </div>
+</section>
+
+<!-- ============ CAMPAIGNS ============ -->
+<section>
+  <div class="sec-head"><h2>Campaigns</h2><span class="tag">What we sent &amp; who we sent it to</span></div>
+
+  <div class="grid kpis">
+    <div class="card kpi"><p class="label">Campaigns sent</p><p class="val">40</p><p class="meta">34 email · 6 SMS</p></div>
+    <div class="card kpi"><p class="label">Total recipients</p><p class="val">1.73M</p><p class="meta">Email 1.64M · SMS 95.2K</p></div>
+    <div class="card kpi"><p class="label">Campaign revenue</p><p class="val">$147.9K</p><p class="meta">Email $125.7K · SMS $22.3K</p><p class="kpi-delta" data-mom="-17.1" data-yoy="-33.3"></p></div>
+    <div class="card kpi"><p class="label">Conversions</p><p class="val">606</p><p class="meta">Email 523 · SMS 83</p></div>
+  </div>
+
+  <h3 style="margin-top:30px">Strategy: what went out</h3>
+  <p>The campaign calendar followed a clear segmented-merchandising playbook. Early May leaned into <strong>Mother's Day</strong> with four full-list "Edit" sends plus an SMS push, then pivoted almost entirely to <strong>men's category storytelling</strong> — each send targeting a product-affinity segment (Men's Pant Affinity, Polos Affinity, Short Sleeve Shirt Affinity, Denim Affinity) layered on top of a 180-day engaged-email base. Women's sends went to predicted-female and women's-shopper segments. Nearly every send excluded recent purchasers (7 &amp; 30 day), bounce-risk subscribers, and SMS error profiles — disciplined list hygiene that protects deliverability.</p>
+
+  <div class="split">
+    <div class="card"><h3>Email revenue by merchandising category</h3><div class="chartbox"><canvas id="catChart"></canvas></div>
+      <p class="note">Bars show total revenue; green labels show revenue per recipient. Men's drove ~74% of email campaign revenue <em>and</em> the highest efficiency at $0.10/recipient — roughly 2× the women's and full-list sends. (Wholesale excluded.)</p></div>
+    <div class="card"><h3>Channel comparison — engagement &amp; efficiency</h3>
+      <table>
+        <thead><tr><th>Metric</th><th>Email</th><th>SMS</th></tr></thead>
+        <tbody>
+          <tr><td class="name">Recipients</td><td>1,635,735</td><td>95,176</td></tr>
+          <tr><td class="name">Delivery rate</td><td>99.6%</td><td>99.97%</td></tr>
+          <tr><td class="name">Open rate</td><td>51.7%</td><td>—</td></tr>
+          <tr><td class="name">Click rate</td><td>0.33%</td><td>0.98%</td></tr>
+          <tr><td class="name">Conversions</td><td>523</td><td>83</td></tr>
+          <tr><td class="name">Unsub rate</td><td>0.10%</td><td>0.27%</td></tr>
+          <tr><td class="name">Revenue / recipient</td><td>$0.077</td><td>$0.234</td></tr>
+          <tr><td class="name">Total revenue</td><td>$125,685</td><td>$22,261</td></tr>
+        </tbody>
+      </table>
+      <p class="note">SMS earned 3× more revenue per recipient and a higher click rate, but a higher unsubscribe rate — use it selectively for the highest-intent moments.</p>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:20px">
+    <h3>Men's email campaigns — top 10 by revenue</h3>
+    <table>
+      <thead><tr><th>Campaign</th><th>Send date</th><th>Recipients</th><th>Open</th><th>Click</th><th>Conv.</th><th>Unsubs</th><th>Revenue</th></tr></thead>
+      <tbody id="emailTop"></tbody>
+    </table>
+  </div>
+
+  <div class="card" style="margin-top:20px">
+    <h3>Women's email campaigns by revenue</h3>
+    <table>
+      <thead><tr><th>Campaign</th><th>Send date</th><th>Recipients</th><th>Open</th><th>Click</th><th>Conv.</th><th>Unsubs</th><th>Revenue</th></tr></thead>
+      <tbody id="womensTop"></tbody>
+    </table>
+  </div>
+
+  <div class="card" style="margin-top:20px">
+    <h3>Full / Mixed email campaigns by revenue</h3>
+    <table>
+      <thead><tr><th>Campaign</th><th>Send date</th><th>Recipients</th><th>Open</th><th>Click</th><th>Conv.</th><th>Unsubs</th><th>Revenue</th></tr></thead>
+      <tbody id="mixedTop"></tbody>
+    </table>
+  </div>
+
+  <div class="card" style="margin-top:20px">
+    <h3>SMS campaigns — full month</h3>
+    <table>
+      <thead><tr><th>Campaign</th><th>Recipients</th><th>Click</th><th>Conv.</th><th>Unsub</th><th>Revenue</th></tr></thead>
+      <tbody id="smsTop"></tbody>
+    </table>
+    <p class="note">All SMS sent to the "SMS Subscribers" segment, excluding SMS errors and recent purchasers; the May 25 swim send also suppressed unengaged SMS.</p>
+  </div>
+
+  <div class="takeaway">
+    <h4>Takeaways — Campaigns</h4>
+    <ul>
+      <li><strong>Men's drives the business.</strong> 15 men's email sends produced ~$92.6K (74% of email campaign revenue). Continue the category-drop cadence and protect this engine.</li>
+      <li><strong>Best individual performers</strong> were men's bottoms and swim: Short Sleeve Shirts ($11.1K), Swim Edit 02 ($9.8K), and Generation Pants ($8.4K) led the month.</li>
+      <li><strong>SMS punches above its weight.</strong> At $0.23 revenue/recipient vs $0.08 for email, reserve SMS for marquee launches and time-sensitive offers rather than broad sends.</li>
+      <li><strong>Mother's Day full-list sends</strong> delivered reach and strong opens (46–47%) but low click/conversion — broad "edit" emails work better as awareness than as direct-response. Consider tighter product focus or a clearer offer next year.</li>
+      <li><strong>Women's is small but growing in engagement</strong> ( ~$10.8K). Continue with caddence and focus new key women's categories to keep growing the engaged female segment.</li>
+      <li><strong>Why the low performers lagged — it's product &amp; audience, not timing.</strong> The weakest men's send, Pullovers ($2.9K), still opened at 58% but barely converted — a warm-layer product landing in late-May warm-weather demand while swim, shorts and pants were winning. Time edits with seasonally appropriate items to grow conversion. Women's sends cap lower mainly on <em>audience size</em> (a ~33–48K engaged-female base vs ~60–84K for men's), not creative. Day-of-week showed no clear penalty — the two Sunday-noon sends (Generation Pants and SWIM) were both top-five performers. The softest subject lines were the generic full-list ones ("Gifts for Mom," "Happy Mother's Day") rather than the product-named men's drops.</li>
+    </ul>
+  </div>
+
+  <div class="takeaway" style="border-left-color:var(--sms)">
+    <h4>Full-month view — patterns across all 40 sends</h4>
+    <ul>
+      <li><strong>Tighter segments open ~10 points higher.</strong> Sends to affinity / 180-day-engaged segments opened 56–63%, while full-list sends (the Mother's Day edits, Resort, Best Sellers, full SWIM) opened 46–49%. The engaged-segment targeting on the men's drops is the single biggest engagement lever — and explains most of the open-rate spread across the month.</li>
+      <li><strong>Heavy cadence, healthy list.</strong> May ran ~34 email + 6 SMS sends (more than one a day), yet unsubscribe rate held at ~0.10% and delivery at 99.6%. The disciplined exclusions on nearly every send — recent purchasers (7 &amp; 30 day), bounce-risk and SMS-error profiles — protected the base despite the volume.</li>
+      <li><strong>The pant/denim affinity segment did the heavy lifting — and the most sends.</strong> Six pant/denim drops hit that segment in May (5-Pocket, Infinity, Zuma, Generation Pants, Generation Denim, Union Denim). Performance held, but it's the first segment to watch for fatigue — space these out or rotate categories.</li>
+      <li><strong>Resends are working as a second touch.</strong> The Seersucker resend to non-openers added ~$4.7K, and the women's Shorts AM→PM split recovered extra orders. Both reused the original subject, though — varying the subject line on the second touch is the easy win left on the table.</li>
+      <li><strong>Weekends convert.</strong> The Saturday and Sunday-noon sends ranked among the month's strongest, so the calendar should treat weekends as prime real estate for some of our strongest content pieces.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ FLOWS ============ -->
+<section>
+  <div class="sec-head"><h2>Flows</h2><span class="tag">Always-on automated revenue</span></div>
+
+  <div class="grid kpis">
+    <div class="card kpi"><p class="label">Flow revenue</p><p class="val">$189.7K</p><p class="meta">56% of total attributed</p><p class="kpi-delta" data-mom="-0.5" data-yoy="155.3"></p></div>
+    <div class="card kpi"><p class="label">Recipients</p><p class="val">38.2K</p><p class="meta">vs 1.73M campaign</p></div>
+    <div class="card kpi"><p class="label">Conversions</p><p class="val">768</p><p class="meta">More than all campaigns combined</p></div>
+    <div class="card kpi"><p class="label">Revenue / recipient</p><p class="val">$4.97</p><p class="meta">65× campaign efficiency</p></div>
+  </div>
+
+  <p style="margin-top:24px">Flows are the most efficient revenue source in the account by a wide margin. With roughly one-fortieth the audience of campaigns, they generated more total revenue and more conversions. The standouts are the <strong>Welcome series</strong> (SMS + email) capturing new subscribers at peak intent, and the <strong>abandonment trio</strong> (Add to Cart, Browse, Checkout) recovering would-be lost sales. The <strong>Welcome SMS</strong> flow alone earned $62.8K at an extraordinary $45 revenue per recipient.</p>
+
+  <div class="split">
+    <div class="card"><h3>Top flows by revenue</h3><div class="chartbox"><canvas id="flowChart"></canvas></div></div>
+    <div class="card">
+      <h3>Flow detail</h3>
+      <table>
+        <thead><tr><th>Flow</th><th>Recip.</th><th>Conv.</th><th>Rev / recip</th><th>Revenue</th></tr></thead>
+        <tbody id="flowTbl"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="takeaway">
+    <h4>Takeaways — Flows</h4>
+    <ul>
+      <li><strong>Welcome flows are the crown jewel.</strong> Welcome SMS ($62.8K) and Welcome Series Email ($39.4K) together drove $102K — over half of flow revenue. Keep new-subscriber capture funded and well-supplied with offers.</li>
+      <li><strong>Abandonment recovery is healthy.</strong> Add-to-Cart, Browse and Checkout flows combined for ~$48K; the Add to Cart flow's $411 average order value is the highest in the account.</li>
+      <li><strong>Loyalty flows are emerging winners.</strong> Loyalty Welcome ($9.5K) and Points Earned ($5.6K) convert well — worth expanding loyalty-triggered automation.</li>
+      <li><strong>Zero-revenue flows to review:</strong> Loyalty Points Reminder and Wishlist drove engagement but $0 attributed revenue in May — revisit offer, timing, or product links.</li>
+      <li><strong>Highest-unsub flow:</strong> Next Best Product – Cross Sell (48 unsubs) and Welcome Series (175) — monitor frequency and content to protect the list.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ SUBSCRIBERS ============ -->
+<section>
+  <div class="sec-head"><h2>Subscribers</h2><span class="tag">List growth — email &amp; SMS</span></div>
+
+  <div class="grid k3">
+    <div class="card kpi"><p class="label">Email — net growth</p><p class="val pos">+1,212</p><p class="meta">3,374 subs · 2,162 unsubs</p></div>
+    <div class="card kpi"><p class="label">SMS — net growth</p><p class="val pos">+187</p><p class="meta">771 subs · 584 unsubs</p></div>
+    <div class="card kpi"><p class="label">Combined net</p><p class="val pos">+1,399</p><p class="meta">New marketable profiles in May</p></div>
+  </div>
+
+  <p style="margin-top:24px">Both lists grew on a net basis in May. Email added 3,374 new subscribers against 2,162 opt-outs — a healthy <strong>1.56 : 1 acquisition-to-loss ratio</strong>. New-subscriber volume spiked in the first full week (Mother's Day traffic) then settled into a steady ~550–650/week baseline. SMS growth was slower (1.32 : 1) and unsubscribes rose in the back half of the month, coinciding with the heavier late-May SMS send cadence.</p>
+
+  <div class="split">
+    <div class="card"><h3>Weekly subscriptions vs unsubscriptions</h3><div class="chartbox"><canvas id="subChart"></canvas></div>
+      <p class="note">Week of Apr 27 is partial (includes Apr 27–30). Buckets shown by week start, US/Pacific.</p></div>
+    <div class="card"><h3>Net growth by channel</h3><div class="chartbox"><canvas id="netChart"></canvas></div></div>
+  </div>
+
+  <div class="takeaway">
+    <h4>Takeaways — Subscribers</h4>
+    <ul>
+      <li><strong>Acquisition is outpacing churn on both channels</strong> — the foundation of compounding owned-audience revenue.</li>
+      <li><strong>Email churn is concentrated in flows &amp; high-frequency sends.</strong> Welcome Series (175 unsubs) and broad full-list sends carry most opt-outs; tightening segmentation can preserve growth.</li>
+      <li><strong>SMS unsubs climbed in weeks 4–5</strong> alongside more frequent texting. Cap SMS frequency and keep suppressing recent purchasers / unengaged to protect the smaller, higher-value list.</li>
+      <li><strong>Capitalize on the Mother's Day acquisition spike</strong> — the early-May cohort (1,380 email subs in one week) should be flowing through the Welcome series; ensure that handoff is well-tuned given Welcome's outsized revenue.</li>
+    </ul>
+  </div>
+</section>
+
+</div><!-- /tab-perf -->
+
+<div id="tab-creative" class="tabpanel">
+  <section style="margin-top:30px">
+    <div class="sec-head"><h2>Creative Report</h2><span class="tag">Subject lines, preview text &amp; above-the-fold art</span></div>
+    <div class="cmp-bar" style="margin:20px 0 0">
+      <span class="cmp-title">Channel:</span>
+      <div class="cmp-seg">
+        <button class="active" onclick="setCreative('email',this)">Email</button>
+        <button onclick="setCreative('sms',this)">SMS</button>
+      </div>
+      <span class="cmp-note" id="creative-note">Email creative — top &amp; bottom performers by audience</span>
+    </div>
+  </section>
+  <div id="cr-email-view">
+   <section style="margin-top:16px">
+    <div class="hero-feature">
+     <div class="hf-visual">
+       <span class="hf-badge">🏆 Best creative of the month</span>
+       <p class="hf-meta">MENS – Short Sleeve Shirts · <strong>$11,060</strong> · $0.18/recipient · 40 orders</p>
+       <div class="hf-frame"><div class="hf-scroll" id="hf-email"></div><span class="hf-hint">scroll to view the full email ↑</span></div>
+     </div>
+     <div class="hf-copy">
+      <div class="takeaway" style="margin:0 0 16px;border-left-color:#caa53a;background:#fdfaf0">
+        <h4 style="color:#8a6d1f">Why this won best creative</h4>
+        <ul>
+          <li><strong>A specific, benefit-clear subject.</strong> "Clean Classic Shirts" sets a plain, confident expectation — nothing to decode — paired with a preview ("New men's short sleeves, in now.") that confirms the offer.</li>
+          <li><strong>Shoppable from the first scroll.</strong> It opens on a clean single-product hero, not a lifestyle or text banner — the product <em>is</em> the message, so intent-to-buy carries straight through.</li>
+          <li><strong>Right product, right segment, right time.</strong> An in-season staple (short sleeves into summer) sent to the engaged men's base — the result was the month's best efficiency at $0.18/recipient and the top revenue overall ($11.1K).</li>
+        </ul>
+      </div>
+      <p><strong>Overall, May was a strong, disciplined creative month.</strong> The team kept a consistent, clean brand look — single-product hero shots on white, a steady logo lockup, and tidy preview text — and let merchandising do the work. Performance separated cleanly along two lines: <strong>tightly-targeted men's product drops with specific, product-named subject lines were the clear winners</strong>, while broad full-list Mother's Day sends drove reach and opens but converted less efficiently. The variance came from <em>audience and specificity</em>, not design quality.</p>
+    <p>Two findings sharpen that read. First, <strong>opens are inflated by Apple Mail Privacy, so the real gap is click-through</strong> — the creative reliably earns the open; turning that open into a click-to-buy is where to push (clearer in-email CTAs, fewer competing links). Second, <strong>the details decide it</strong>: winners led on a shoppable product hero, while the softest sends opened on a text banner ("Happy Mother's Day") or a vague lifestyle shot — and the free-tote offer that could have driven response sat in preview text instead of the subject line. Resends recovered real revenue but reused the original subject; varying it on the second touch is an easy win.</p>
+    <div class="takeaway" style="margin:14px 0;border-left-color:var(--pos);background:#f4f8f6">
+      <h4 style="color:var(--pos)">★ Main takeaway for the team</h4>
+      <p style="margin:0;color:#374151">The creative is doing its job — <strong>the next gain isn't prettier emails, it's sharper specificity.</strong> Name the product in the subject, lead on a shoppable hero, put the offer <em>in</em> the subject line, and carry the men's "name it, show it" discipline into the women's and full-list sends. Then chase the click, not the open.</p>
+    </div>
+    <p style="color:var(--muted);font-size:13.5px">Below: top and bottom performers by audience, with the actual hero artwork (above-the-fold image), subject line and preview text, plus a quick read on what worked and what to consider for each. <strong>Click any email to view the full creative.</strong> Ranked by attributed revenue.</p>
+    <div class="takeaway" style="margin-top:14px">
+      <h4>What worked across subject lines &amp; above-the-fold</h4>
+      <ul>
+        <li><strong>Specific product names beat generic hooks.</strong> The top earners named the product or franchise — "Clean Classic Shirts," "The Pant Series 03: Generation™," "Pool Day, Solved" — while vaguer lines ("It's Heating Up," "Gifts for Mom") under-indexed.</li>
+        <li><strong>Lead with the product, not a lifestyle banner.</strong> Every top performer opened on a clean, single-product hero shot above the fold; softer editorial/lifestyle openers (Resort, the Mother's Day edits) converted less efficiently.</li>
+        <li><strong>Preview text that adds a concrete detail outperforms.</strong> "New men's short sleeves, in now." and "New swim trunks, plus the soft tees and tanks to match." reinforce the offer; generic previews ("Best sellers, all week.") leave the open-decision to the subject alone.</li>
+        <li><strong>Offer-driven Mother's Day subjects</strong> ("Last Call for Mom," "Free tote on orders $300+") were the strongest of the full-list sends — urgency + incentive lifted an otherwise broad audience.</li>
+      </ul>
+    </div>
+     </div><!-- /hf-copy -->
+    </div><!-- /hero-feature -->
+  </section>
+
+  <div class="cmp-bar" style="margin:10px 0 -6px"><span class="cmp-title">Audience:</span><div class="cmp-seg" id="aud-seg"><button class="active" onclick="setAudience('mens',this)">Men's</button><button onclick="setAudience('womens',this)">Women's</button><button onclick="setAudience('mixed',this)">Mixed</button></div></div>
+  <section id="cr-mens"></section>
+  <section id="cr-womens" style="display:none"></section>
+  <section id="cr-mixed" style="display:none"></section>
+  </div><!-- /cr-email-view -->
+
+  <div id="cr-sms-view" style="display:none">
+    <section style="margin-top:16px">
+      <p style="margin-top:14px">SMS was the month's most efficient channel — <strong>~$0.23 revenue per recipient, roughly 3× email</strong> — built on short, link-first messages and (mostly) a single MMS product image. Click-through is the headroom: rates ran <strong>0.7–1.6%</strong>, below the ~3% benchmark, so the lever is the same as email — a tighter message and a clearer reason to tap. Below: each May SMS as it landed, ranked by attributed revenue.</p>
+      <div class="sms-grid" id="sms-grid"></div>
+      <p class="sms-foot" id="sms-extra" style="margin-top:20px;text-align:left;font-size:12px"></p>
+      <div class="takeaway" style="margin-top:18px">
+        <h4>Takeaways — SMS</h4>
+        <ul>
+          <li><strong>Offer drove the top send.</strong> "Mothers Day" led on revenue ($5.1K) with a real incentive (free shipping + tote, code FORMOM26) — and no image needed. A clear offer beats a pretty picture on SMS.</li>
+          <li><strong>Specific, in-season product won clicks.</strong> Seersucker and Swim posted the best click rates (1.6%), each pairing a named seasonal category with a clean MMS shot.</li>
+          <li><strong>Tighter targeting pays.</strong> The Swim send went to the smallest, most-filtered list (6.2K, unengaged suppressed) and returned the highest revenue per recipient at <strong>$0.46</strong>.</li>
+          <li><strong>Click-through is the gap.</strong> Strong revenue per recipient but sub-benchmark CTR — shorten copy, lead with the offer or the single best product, and keep one clear link.</li>
+        </ul>
+      </div>
+    </section>
+  </div><!-- /cr-sms-view -->
+</div><!-- /tab-creative -->
+
+<div id="tab-health" class="tabpanel">
+  <section style="margin-top:30px">
+    <div class="sec-head"><h2>Retention Health</h2><span class="tag">May 2026 · composite scorecard vs industry benchmarks</span></div>
+  </section>
+  <div id="health-body"></div>
+</div><!-- /tab-health -->
+
+<div class="lb" id="lightbox" onclick="if(event.target===this)closeLB()">
+  <div class="lb-inner">
+    <div class="lb-head">
+      <div><h3 id="lb-name"></h3><p class="meta" id="lb-meta"></p></div>
+      <button class="lb-close" onclick="closeLB()" aria-label="Close">×</button>
+    </div>
+    <div class="lb-stats" id="lb-stats"></div>
+    <div class="lb-scroll" id="lb-scroll"></div>
+    <p class="lb-note">Full email creative as sent · imagery loads live from Klaviyo's CDN</p>
+  </div>
+</div>
+
+<div class="footer">
+  Source: Klaviyo (account 7Diamonds, TSt5zk). Campaign &amp; flow figures use send-date attribution (Placed Order conversion metric); subscriber counts use event-time aggregation and are reported separately. Email open rates reflect Apple Mail Privacy inflation and are best read as a directional trend. Report generated for the May 1–31, 2026 reporting period.
+</div>
+
+</div>
+
+<script>
+const money=v=>'$'+v.toLocaleString('en-US',{maximumFractionDigits:0});
+const C={ink:'#1f2430',email:'#3b4252',sms:'#9aa3b2',pos:'#3f7d62',neg:'#c08a8a',line:'#e8e9ec',muted:'#9ca3af',
+  gradient:['#2f3645','#454e5e','#5b6577','#727d8e','#9aa3b2','#bcc3cd']};
+Chart.defaults.font.family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
+Chart.defaults.font.size=12;Chart.defaults.color='#6b7280';
+
+// Revenue mix doughnut
+new Chart(mixChart,{type:'doughnut',data:{labels:['Flows','Campaigns'],
+ datasets:[{data:[189721.72,147946.74],backgroundColor:[C.email,C.sms],borderWidth:2,borderColor:'#fff'}]},
+ options:{cutout:'62%',plugins:{legend:{position:'bottom'},tooltip:{callbacks:{label:c=>c.label+': '+money(c.parsed)}}}}});
+
+// Revenue by channel
+new Chart(chanChart,{type:'doughnut',data:{labels:['Email (campaigns+flows)','SMS (campaigns+flows)'],
+ datasets:[{data:[233444.48,104223.98],backgroundColor:[C.email,C.sms],borderWidth:2,borderColor:'#fff'}]},
+ options:{cutout:'62%',plugins:{legend:{position:'bottom'},tooltip:{callbacks:{label:c=>c.label.split(' ')[0]+': '+money(c.parsed)}}}}});
+
+// Email by category (Wholesale excluded) — bars = revenue, end label = revenue/recipient
+const catRPR=[0.100,0.045,0.048];
+new Chart(catChart,{type:'bar',data:{labels:["Men's","Full / Mixed","Women's"],
+ datasets:[{data:[92618.08,22304.46,9173.62],backgroundColor:C.gradient.slice(0,3),borderRadius:5}]},
+ options:{indexAxis:'y',plugins:{legend:{display:false},
+   tooltip:{callbacks:{label:c=>money(c.parsed.x)+'  ·  $'+catRPR[c.dataIndex].toFixed(3)+' / recipient'}}},
+   scales:{x:{max:110000,ticks:{callback:v=>'$'+(v/1000)+'K'},grid:{color:C.line}},y:{grid:{display:false}}}},
+ plugins:[{id:'rprLabels',afterDatasetsDraw(chart){
+   const ctx=chart.ctx, meta=chart.getDatasetMeta(0);
+   ctx.save();ctx.font="600 11.5px -apple-system,BlinkMacSystemFont,'Segoe UI',Arial";ctx.fillStyle=C.pos;ctx.textBaseline='middle';
+   meta.data.forEach((bar,i)=>{ctx.fillText('$'+catRPR[i].toFixed(3)+'/recip',bar.x+8,bar.y);});
+   ctx.restore();
+ }}]});
+
+// Top email campaigns
+// [name, recipients, open, click, conv, revenue, subject, unsubs, dateShort, dowTime]
+const emailRows=[
+["MENS - Short Sleeve Shirts",61082,"55.7%","0.50%",40,11059.94,"Clean Classic Shirts",88,"May 20","Wed · 6:00 AM PT"],
+["MENS - SWIM EDIT 02",57323,"56.3%","0.40%",37,9798.84,"Pool Day, Solved",73,"May 25","Mon · 2:01 PM PT"],
+["MENS - Generation Pants",60285,"56.4%","0.39%",34,8437.98,"The Pant Series 03: Generation™ 5-Pocket",81,"May 17","Sun · 12:00 PM PT"],
+["MENS - SWIM",83665,"47.2%","0.44%",27,7090.20,"Swim Trunks that Go Places",78,"May 24","Sun · 12:00 PM PT"],
+["MENS - Polos",59038,"56.4%","0.40%",29,6519.33,"The Polo, Refined",61,"May 14","Thu · 6:00 AM PT"],
+["MENS - Coastal Cotton",57302,"59.0%","0.60%",26,6264.71,"Lightweight Short Sleeve Shirts",60,"May 28","Thu · 6:00 AM PT"],
+["MENS - Best Sellers",82242,"47.1%","0.41%",28,6194.46,"Most Worn",93,"May 4","Mon · 6:00 AM PT"],
+["MENS - Zuma Pants",60472,"56.7%","0.46%",22,5869.88,"The Pant Series 02: Zuma Chino",62,"May 16","Sat · 12:00 PM PT"],
+["MENS - Infinity Pants",59415,"57.4%","0.42%",16,5317.42,"The Pant Series 01: Infinity™ 7-Pocket",49,"May 15","Fri · 12:00 AM PT"],
+["MENS - 5-Pocket Pant",77745,"49.8%","0.47%",28,5363.93,"Your New Go-To Pant",86,"May 12","Tue · 7:35 AM PT"]];
+// [name, recipients, open, click, conv, revenue, subject, unsubs, dateShort, dowTime]
+function campRow(r){return `<tr><td class="name">${r[0]}<div class="c-subj">“${r[6]}”</div></td><td class="c-date"><div class="d1">${r[8]}</div><div class="d2">${r[9]}</div></td><td>${r[1].toLocaleString()}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td class="u">${r[7]}</td><td>${money(r[5])}<div class="c-rpr">$${(r[5]/r[1]).toFixed(2)}/recip</div></td></tr>`;}
+emailTop.innerHTML=emailRows.map(campRow).join('');
+
+const womensRows=[
+["WOMEN'S - Pants",38671,"58.5%","0.17%",12,2457.40,"New Rotation: Tailored Ease",37,"May 29","Fri · 6:00 AM PT"],
+["WOMEN'S - Not Just for Mondays",38606,"57.1%","0.23%",10,2234.18,"Not Just For Mondays",47,"May 11","Mon · 6:00 AM PT"],
+["WOMEN'S - Shorts PM",48426,"48.0%","0.18%",7,1928.98,"Short Shorts. Long Days.",58,"May 16","Sat · 2:45 PM PT"],
+["WOMEN'S - Dresses",32310,"51.6%","0.29%",5,1386.70,"Dress Code",37,"May 8","Fri · 6:30 AM PT"],
+["WOMEN'S - Shorts",34874,"56.4%","0.17%",6,1166.36,"Short Shorts. Long Days.",24,"May 16","Sat · 12:00 AM PT"]];
+womensTop.innerHTML=womensRows.map(campRow).join('');
+
+const mixedRows=[
+["FULL - Mother's Day Edit 04",83131,"45.8%","0.13%",22,4751.64,"Last Call for Mom",86,"May 6","Wed · 6:00 AM PT"],
+["MIXED - Getaway Edit",83141,"46.2%","0.30%",19,4401.30,"The Collection That Keeps It Light",78,"May 13","Wed · 6:00 AM PT"],
+["MIXED - Resort",84042,"46.0%","0.31%",19,3818.78,"It's Heating Up",62,"May 23","Sat · 6:00 AM PT"],
+["FULL - Mother's Day 05",83163,"47.4%","0.16%",16,3336.88,"Happy Mother's Day",68,"May 10","Sun · 10:00 AM PT"],
+["FULL - Mother's Day Edit 03",83085,"46.8%","0.16%",13,3123.31,"Still Deciding on Mom?",79,"May 3","Sun · 6:15 AM PT"],
+["FULL - Mother's Day Edit 02",83123,"46.5%","0.14%",13,2872.55,"Gifts for Mom",76,"May 2","Sat · 6:00 AM PT"]];
+mixedTop.innerHTML=mixedRows.map(campRow).join('');
+
+// SMS campaigns
+const smsRows=[
+["SMS FULL Mothers Day 02",18082,"0.87%",15,47,5090.74],
+["SMS Men's Seersucker",17629,"1.59%",18,35,4981.78],
+["SMS Men's Denim",17770,"0.73%",17,51,4437.34],
+["SMS Men's Swim",6226,"1.61%",8,20,2847.43],
+["SMS Men's Pants",17721,"0.70%",14,58,2828.60],
+["SMS Men's Pullovers",17748,"0.82%",11,41,2075.38]];
+smsTop.innerHTML=smsRows.map(r=>`<tr><td class="name">${r[0]}</td><td>${r[1].toLocaleString()}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${money(r[5])}</td></tr>`).join('');
+
+// Top flows
+const flows=[
+["Welcome SMS",1462,256,45.14,62831.07],
+["Welcome Series Email",8396,170,4.69,39423.84],
+["Abandoned Add To Cart",2345,57,9.99,23427.19],
+["Abandoned Browse",9855,69,1.35,13256.07],
+["Abandoned Checkout",1180,45,9.30,10978.34],
+["Loyalty - Welcome Flow",540,35,17.66,9534.45],
+["Next Best Product - Cross Sell",2977,41,2.66,7905.85],
+["Abandoned Browse [Server Side]",3113,24,2.32,7231.85],
+["Loyalty Points Earned",474,16,11.90,5638.46],
+["Abandoned Add To Cart [SS]",630,11,4.74,2986.34],
+["WAIR Sizing Feedback",2355,13,0.64,1506.17],
+["Post-Purchase with Loyalty",1168,9,1.19,1394.76],
+["Abandoned Checkout [SS]",908,5,1.15,1045.56],
+["New Loyalty Tier Earned",347,6,2.58,896.20],
+["Post-Purchase Site Survey",1109,6,0.64,710.60],
+["Back In Stock",100,2,6.11,611.06]];
+new Chart(flowChart,{type:'bar',data:{labels:flows.slice(0,8).map(f=>f[0]),
+ datasets:[{data:flows.slice(0,8).map(f=>f[4]),backgroundColor:C.gradient.concat(['#cdd2da','#dfe3e8']).slice(0,8),borderRadius:5}]},
+ options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>money(c.parsed.x)}}},
+ scales:{x:{ticks:{callback:v=>'$'+(v/1000)+'K'},grid:{color:C.line}},y:{grid:{display:false}}}}});
+flowTbl.innerHTML=flows.map(f=>`<tr><td class="name">${f[0]}</td><td>${f[1].toLocaleString()}</td><td>${f[2]}</td><td>$${f[3].toFixed(2)}</td><td>${money(f[4])}</td></tr>`).join('');
+
+// Subscriber weekly trend
+const weeks=['Apr 27*','May 4','May 11','May 18','May 25'];
+new Chart(subChart,{type:'line',data:{labels:weeks,datasets:[
+ {label:'Email subs',data:[253,1380,647,573,541],borderColor:C.email,backgroundColor:'rgba(59,66,82,.06)',tension:.3,fill:true,pointRadius:3},
+ {label:'Email unsubs',data:[208,506,634,416,403],borderColor:C.neg,borderDash:[5,4],tension:.3,pointRadius:3},
+ {label:'SMS subs',data:[69,129,227,185,172],borderColor:C.sms,tension:.3,pointRadius:3},
+ {label:'SMS unsubs',data:[92,85,59,191,158],borderColor:'#d9b3b3',borderDash:[5,4],tension:.3,pointRadius:3}]},
+ options:{plugins:{legend:{position:'bottom'}},scales:{y:{beginAtZero:true,grid:{color:C.line}},x:{grid:{display:false}}}}});
+
+// Net growth
+new Chart(netChart,{type:'bar',data:{labels:['Email','SMS'],datasets:[
+ {label:'Subscribed',data:[3374,771],backgroundColor:C.email,borderRadius:5},
+ {label:'Unsubscribed',data:[2162,584],backgroundColor:C.sms,borderRadius:5}]},
+ options:{plugins:{legend:{position:'bottom'},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y.toLocaleString()}}},
+ scales:{y:{beginAtZero:true,grid:{color:C.line},ticks:{callback:v=>v.toLocaleString()}},x:{grid:{display:false}}}}});
+
+// ===== Compare (MoM / YoY) =====
+const CMP_NOTE={off:"Toggle to show revenue deltas on the cards below",
+  mom:"May 2026 vs April 2026 (month over month)",
+  yoy:"May 2026 vs May 2025 · context: flows expanded heavily since '25 and the 2025 promo calendar may differ"};
+function setCmp(mode,btn){
+  document.querySelectorAll('.cmp-seg button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('cmp-note').textContent=CMP_NOTE[mode];
+  document.querySelectorAll('.kpi-delta').forEach(el=>{
+    el.classList.remove('show','up','down');
+    if(mode==='off')return;
+    const v=parseFloat(el.getAttribute('data-'+mode));
+    const up=v>=0;
+    el.classList.add('show',up?'up':'down');
+    const arrow=up?'▲':'▼';
+    const vsLabel=mode==='mom'?'vs Apr':'vs May ’25';
+    el.innerHTML=`${arrow} ${up?'+':''}${v.toFixed(1)}% <span class="vs">${vsLabel}</span>`;
+  });
+}
+
+// ===== Tabs =====
+function showTab(id,btn){
+  document.querySelectorAll('.tabpanel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ===== Creative Report =====
+const IMG='https://d3k81ch9hvuctc.cloudfront.net/company/TSt5zk/images/';
+// [name, subject, preview, heroFile, recipients, openRate, conversions, revenue, worked, consider, clicks, clickRate]
+const mensTop=[
+ ["MENS - Short Sleeve Shirts","Clean Classic Shirts","New men's short sleeves, in now.","7d2bcb6c-a509-422c-aae7-47203d17daad.jpeg",61082,"55.7%",40,11059.94,"Specific, benefit-clear subject + a clean single-product hero — the month's most efficient send at $0.18/recipient.","Click rate is still low in absolute terms; a sharper in-email CTA or a second product block could push it higher.",306,"0.50%"],
+ ["MENS - SWIM EDIT 02","Pool Day, Solved","New swim trunks, plus the soft tees and tanks to match.","6d960982-0a85-44d7-87b4-921b5a2ad8b8.jpeg",57323,"56.3%",37,9798.84,"Playful, benefit-led subject ('Pool Day, Solved') and a perfectly in-season swim hero — $0.17/recipient.","Sent to a tighter 57K segment; a proven winner like this can stand a wider audience.",230,"0.40%"],
+ ["MENS - Generation Pants","The Pant Series 03: Generation™ 5-Pocket","Broken-in softness with a more elevated finish.","95367cc9-8b7b-414b-bfaa-a6394c634ef5.jpeg",60285,"56.4%",34,8437.98,"Franchise naming ('Series 03: Generation™') signals a known, trusted product — strong open and conversion.","The 'Series 03' framing assumes familiarity; a plain benefit line would help newer subscribers.",232,"0.39%"],
+ ["MENS - SWIM","Swim Trunks that Go Places","With seersucker stretch, four-way nylon, and prints worth picking through.","f17283af-2501-4bcf-8ee2-c264f1c1bdb4.jpeg",83665,"47.2%",27,7090.20,"Widest reach of the swim sends (84K) on an in-season product — most total orders of the swim group.","Lower open (47%) and $0.08/recipient — the broad audience diluted efficiency vs the tighter Swim Edit 02.",363,"0.44%"],
+ ["MENS - Polos","The Polo, Refined","New arrivals for your seasonal rotation.","80b0af9f-a81c-44e7-8463-36e0040f8eb1.jpeg",59038,"56.4%",29,6519.33,"Crisp subject ('The Polo, Refined') and a focused single-category hero — efficient at $0.11/recipient.","Polos are a staple; a new-color or seasonal hook would differentiate the next send.",233,"0.40%"]];
+const mensBottom=[
+ ["MENS - Pullovers","Well-Rounded Pullovers","Perfect for the back nine and beyond.","65cee913-d3e3-4224-bdde-a2c632d0dcbe.jpeg",57760,"57.9%",16,2902.88,"Still pulled a strong 57.9% open — the list reliably opens men's product drops.","Warm-layer product in a warm month: opens didn't convert. Save pullovers for cooler months and lead with in-season categories.",220,"0.38%"],
+ ["MENS - Linen Shorts","Laguna Linen Shorts","Lighter, cooler, and five ways to wear them.","88f0b7fd-e99b-43c4-8d7d-3fe459098091.jpeg",62556,"62.6%",18,3715.65,"Highest open of the group (62.6%) — 'Laguna Linen Shorts' is specific and seasonally on-point.","A single-item focus narrows the buyer pool; folding into a broader warm-weather shorts edit could lift revenue.",221,"0.36%"],
+ ["MENS - Union Denim","Denim, the Classic Way.","Union Denim is true woven, broken in over time, comfortable from the first wear.","616c3d13-a993-404f-a54c-67610b08d483.jpeg",57693,"59.0%",17,4500.01,"Solid 59% open and a clean denim hero — the franchise still draws attention.","Heavier denim softens in late-May heat; pair with lighter washes or warm-weather styling to convert better.",176,"0.31%"]];
+const womensAll=[
+ ["WOMEN'S - Pants","New Rotation: Tailored Ease","Polished pants designed with a more relaxed point of view.","a5aad743-6c5e-41c5-99dd-73c12287876f.jpeg",38671,"58.5%",12,2457.40,"Benefit-led subject ('Tailored Ease') + a clean tailored-product hero made it the top women's send.","Strong open, modest orders — the small engaged-female base caps upside; growing the segment is the lever.",64,"0.17%"],
+ ["WOMEN'S - Not Just for Mondays","Not Just For Mondays","Best sellers, all week.","e248e6c8-91b5-4b5b-aa42-c126cbd7f0fb.gif",38606,"57.1%",10,2234.18,"An animated best-sellers hero (GIF) and a punchy subject earned a high 57% open.","'Best sellers, all week' is generic — naming the hero product could turn those opens into more orders.",90,"0.23%"],
+ ["WOMEN'S - Shorts PM","Short Shorts. Long Days.","Along for the ride, detours, and any plot twists ahead.","95d61cc6-5f1e-4e1d-b899-c73af38d183e.jpeg",48426,"48.0%",7,1928.98,"A PM resend recovered incremental orders from people who didn't open the AM send.","Reusing the exact AM subject and creative limits the second-touch lift — vary the subject for resends.",87,"0.18%"],
+ ["WOMEN'S - Dresses","Dress Code","Newly arrived, easily worn.","172f1144-fa3b-44f6-a86a-1560639d933c.jpeg",32310,"51.6%",5,1386.70,"Short, on-brand subject ('Dress Code') with a clear dress-category hero.","Niche category on a small (~32K) audience caps revenue; reserve for peak dress-demand or pair with a broader women's edit.",93,"0.29%"],
+ ["WOMEN'S - Shorts","Short Shorts. Long Days.","Along for the ride, detours, and any plot twists ahead.","95d61cc6-5f1e-4e1d-b899-c73af38d183e.jpeg",34874,"56.4%",6,1166.36,"Strong 56% open — the spring/denim shorts hero landed with the female segment.","Split with its PM resend on a small base; a single well-timed send (or larger segment) would concentrate the revenue.",58,"0.17%"]];
+const mixedAll=[
+ ["FULL - Mother's Day Edit 04","Last Call for Mom","Use overnight shipping. Free tote on orders $300+","62fa36ba-a8b1-4d19-969e-593f43374a8b.jpeg",83131,"45.8%",22,4751.64,"Urgency + incentive in the subject ('Last Call for Mom' + overnight shipping / free tote) made it the top full-list send.","Broad-list opens sit ~46%; segmenting gift-intent shoppers could lift conversion further.",109,"0.13%"],
+ ["MIXED - Getaway Edit","The Collection That Keeps It Light","From short sleeves to pants, Seersucker is the right choice for the warm seasons ahead.","db111072-7f9b-4d66-93cd-3db30aa57cf8.jpeg",83141,"46.2%",19,4401.30,"A clear seasonal theme ('Keeps It Light' / seersucker) gave the broad send a reason to open.","Theme is evocative but not product-specific; a named hero item would sharpen direct response.",246,"0.30%"],
+ ["MIXED - Resort","It's Heating Up","Resort dressing for him and her.","97fc1a47-bcbb-408c-bd3f-1bdf46ed9023.jpeg",84042,"46.0%",19,3818.78,"Widest reach of the month (84K) with an aspirational resort hero.","'It's Heating Up' is vague — a product-named subject would likely convert the large audience better.",258,"0.31%"],
+ ["FULL - Mother's Day 05","Happy Mother's Day","A small thanks to the moms in our lives.","beaad1fe-9515-4493-9a06-5ea7b83bb4d3.jpeg",83163,"47.4%",16,3336.88,"Highest open of the Mother's Day edits (47.4%) — the holiday hook reliably earns the open.","A text-only 'Happy Mother's Day' hero leads with a message, not product — open on a shoppable image instead.",128,"0.16%"],
+ ["FULL - Mother's Day Edit 03","Still Deciding on Mom?","Our most-gifted pieces this season.","a42f9fcf-c38e-477f-8ab1-c84748885a3b.jpeg",83085,"46.8%",13,3123.31,"'Still Deciding on Mom?' speaks to procrastinators — a smart late-window angle.","Broad audience + awareness framing converts softly; add a clear gift CTA or price points.",135,"0.16%"],
+ ["FULL - Mother's Day Edit 02","Gifts for Mom","Free tote on orders $300+","af5b0abb-ced3-4297-8dc5-e49cadc5666c.jpeg",83123,"46.5%",13,2872.55,"Carried a real incentive (free tote) and reached the full list.","Generic 'Gifts for Mom' subject buries the offer in preview text — lead the subject with the incentive to lift response.",114,"0.14%"]];
+
+// Full email image sequences (above-the-fold + body, in order), keyed by hero file
+const GAL={
+ "7d2bcb6c-a509-422c-aae7-47203d17daad.jpeg":["7d2bcb6c-a509-422c-aae7-47203d17daad.jpeg","d5302efe-7612-46b4-b08d-0e1c21af4918.jpeg","5431d787-4de1-4cc1-ace4-0edbded490eb.jpeg","50557f5b-4faa-4a57-a280-f748e248efb7.jpeg","dc3c2fd9-088d-4b65-8580-056ad0b2517f.jpeg","89c03294-dcfb-42ed-9c9b-7e381c3c5316.jpeg"],
+ "6d960982-0a85-44d7-87b4-921b5a2ad8b8.jpeg":["6d960982-0a85-44d7-87b4-921b5a2ad8b8.jpeg","a9495874-f0ce-4775-aaa5-9df46881b62e.jpeg","21f9af62-cf0f-4054-b089-fb01f75f6979.jpeg","aeb11072-16b0-4b74-b6e4-62ae411f9239.jpeg","a08e5057-72c9-4e17-a6ee-6f0d10aaa63a.jpeg","d1f48807-6514-4fe3-887e-a05ab32d4e51.jpeg"],
+ "95367cc9-8b7b-414b-bfaa-a6394c634ef5.jpeg":["95367cc9-8b7b-414b-bfaa-a6394c634ef5.jpeg","e03d3948-a664-4871-b380-9974834f6284.jpeg","b444fd4b-960e-4208-b644-a9158f7ef159.jpeg","6b6f447c-7cc0-4336-bfae-8b98c1303c72.jpeg"],
+ "f17283af-2501-4bcf-8ee2-c264f1c1bdb4.jpeg":["f17283af-2501-4bcf-8ee2-c264f1c1bdb4.jpeg","9225fef2-3eb9-4b40-9d32-30153507c95f.jpeg","7d57411d-bff6-4ce9-b6e5-3f6354822aae.jpeg","cd35e176-d4e9-4490-be39-68bd0e016dff.jpeg","f101a8d5-fd69-4876-8430-aa78dd55a322.jpeg"],
+ "80b0af9f-a81c-44e7-8463-36e0040f8eb1.jpeg":["80b0af9f-a81c-44e7-8463-36e0040f8eb1.jpeg","267e4b93-b285-4be2-b761-8490b78b8d5f.jpeg","0f20b5fa-0bbc-4888-ae13-0ba099a7d521.jpeg","ea317cff-9ae4-49b4-95a3-12586f5ef93e.jpeg","70f64e87-5962-4418-9117-729efbd2cdae.jpeg","d843af07-34fb-4ff4-9f6f-f7869c1c18e8.jpeg"],
+ "65cee913-d3e3-4224-bdde-a2c632d0dcbe.jpeg":["65cee913-d3e3-4224-bdde-a2c632d0dcbe.jpeg","66aa2763-ea9c-4023-93fe-6508fc335cb4.jpeg","5cb5e14f-11af-4a20-bf06-82b8c8cf61dc.gif","ca477b70-bda3-40f7-8dbf-62214eaa4521.jpeg","e7d82397-6c54-46c0-98b5-ebab2f14ba5d.jpeg","266fbdff-2f63-43c6-92c4-297e380bc8fe.jpeg"],
+ "88f0b7fd-e99b-43c4-8d7d-3fe459098091.jpeg":["88f0b7fd-e99b-43c4-8d7d-3fe459098091.jpeg","f65d8f24-9852-4718-8506-dad13efa41a6.jpeg","40d8b58c-289c-4af0-850e-bf1236ebe130.jpeg","8f6882e1-5b5f-4f40-a8b7-1dbae2c923e1.jpeg","53c54e71-6357-4798-8b37-73dec41ee23d.jpeg"],
+ "616c3d13-a993-404f-a54c-67610b08d483.jpeg":["616c3d13-a993-404f-a54c-67610b08d483.jpeg","55a685d5-a3fd-4ec9-b746-6d47769ed381.jpeg","3c638709-8311-440e-a909-055480ac741f.jpeg","e94dc134-b6f9-4b66-8122-6cdba49a8f82.jpeg","69a39d65-6132-4d86-a8c7-409f093d1c6d.jpeg"],
+ "a5aad743-6c5e-41c5-99dd-73c12287876f.jpeg":["a5aad743-6c5e-41c5-99dd-73c12287876f.jpeg","868074ce-0ca6-4adb-a498-cf3a59a65a32.jpeg","20ee7066-af30-4d85-abdd-b780dba42aaa.gif","aa1aeb8d-ae3e-49a6-b089-1e439f3ccbc2.jpeg","2c14b39d-5757-4177-b71f-0a878819dd00.jpeg"],
+ "e248e6c8-91b5-4b5b-aa42-c126cbd7f0fb.gif":["e248e6c8-91b5-4b5b-aa42-c126cbd7f0fb.gif","071015dc-e482-40a4-97a7-3b0ec03605ba.jpeg","2f44af11-c794-4c32-b2ad-205e5a1bb6b0.jpeg","74f7a82a-fb26-4510-af5b-76827c4adb6c.jpeg"],
+ "95d61cc6-5f1e-4e1d-b899-c73af38d183e.jpeg":["95d61cc6-5f1e-4e1d-b899-c73af38d183e.jpeg","0bab7680-ed34-40c3-b735-921f6380dc0a.jpeg","e9ec1293-c914-4228-9505-a1b65d021a0d.jpeg","1d57ea55-fd40-425c-922a-01e7b2a21dc7.jpeg","33243d68-9a61-487f-88f0-8291c3a9e49a.jpeg"],
+ "172f1144-fa3b-44f6-a86a-1560639d933c.jpeg":["172f1144-fa3b-44f6-a86a-1560639d933c.jpeg","0f3715df-e7e0-4131-a5d1-017c88e1f8f5.jpeg","2e5d1f43-76c1-485f-9635-e215cfee9867.jpeg","6c11056d-50ed-4551-af62-5a411dca6c1c.jpeg"],
+ "62fa36ba-a8b1-4d19-969e-593f43374a8b.jpeg":["62fa36ba-a8b1-4d19-969e-593f43374a8b.jpeg","e06ff37f-65d1-4768-914a-f1b8f52ccf8c.jpeg","67336d0d-7764-4733-acf3-606ea244c011.jpeg","b05f4795-cbea-4837-a76a-d9afd038dce7.jpeg"],
+ "db111072-7f9b-4d66-93cd-3db30aa57cf8.jpeg":["db111072-7f9b-4d66-93cd-3db30aa57cf8.jpeg","8ddc8662-4dda-4c4b-8ba0-c9a98e470915.jpeg","a314fc24-4e0c-4bbf-9221-19486c663f60.jpeg","9ba609f9-e775-448d-a2d9-3abdbbe71ed5.jpeg","cf4c902b-8939-474d-9bcd-2ab35421bc6c.jpeg","1d84111c-115c-4527-8458-33e016c547e9.jpeg"],
+ "97fc1a47-bcbb-408c-bd3f-1bdf46ed9023.jpeg":["97fc1a47-bcbb-408c-bd3f-1bdf46ed9023.jpeg","dea0eb4d-8b38-4208-bca7-f88d05a88ef8.jpeg","033b05b6-9903-4b44-b4ae-e26f2947ba42.jpeg","1b9bf559-bb46-410e-a191-3b5f6cd54c4d.jpeg","f58690f9-7a7d-4028-8cf1-bf4888bea6c7.jpeg","46446616-f6db-4bb6-9298-a0b0897ad4a7.jpeg","163ae261-0cc5-4bf7-9d2e-7fdac84d0f4c.jpeg","7b03f534-38af-425e-b010-b61d32fe16b7.jpeg"],
+ "beaad1fe-9515-4493-9a06-5ea7b83bb4d3.jpeg":["beaad1fe-9515-4493-9a06-5ea7b83bb4d3.jpeg","ed042499-b356-4dea-b65b-52e6a448290d.gif","24819a7b-d47e-44a6-98fe-5038397c73f7.jpeg","6653b87d-6f4f-4bc6-9307-8f03c4a8f521.jpeg","0a8a9c3a-febb-4b43-929f-903f6a764bf5.jpeg"],
+ "a42f9fcf-c38e-477f-8ab1-c84748885a3b.jpeg":["a42f9fcf-c38e-477f-8ab1-c84748885a3b.jpeg","d0714726-f212-48a9-b43e-07c6623967cc.jpeg","5b2173de-212e-4b7f-9a10-078572be5a4e.jpeg","58919896-117a-4bd2-8c6a-446c579a0c0d.jpeg","a63734c1-e2f1-442d-bcc5-a7b1099a94d4.jpeg"],
+ "af5b0abb-ced3-4297-8dc5-e49cadc5666c.jpeg":["af5b0abb-ced3-4297-8dc5-e49cadc5666c.jpeg","29e49046-be85-4157-bb20-d4d4e1ece2cb.jpeg","8b0aecc4-3ccd-497f-99aa-27357ac07b8b.jpeg","3644fe52-2020-4ff9-a91e-642bb14098b5.jpeg"]
+};
+const FOOTER=["6ed3e659-12a7-4a1f-98b5-e6e532002180.png","67ca126b-c11b-467e-adc3-76366e115fba.jpeg","18f7e77d-02bd-4bfd-99b4-736e61cb6c5b.jpeg"];
+// Best-creative hero preview — full winning email (MENS Short Sleeve Shirts)
+(function(){const win="7d2bcb6c-a509-422c-aae7-47203d17daad.jpeg";const el=document.getElementById('hf-email');
+  if(el)el.innerHTML=(GAL[win]||[win]).concat(FOOTER).map(f=>`<img loading="lazy" src="${IMG}${f}" alt="">`).join('');})();
+const CARDS=[];
+function card(c,rank,lose){
+  const idx=CARDS.length; CARDS.push(c);
+  const rev='$'+c[7].toLocaleString('en-US',{maximumFractionDigits:0});
+  return `<div class="cr-card${lose?' lose':''}" onclick="openLB(${idx})">
+    <div class="cr-rankbar"><span class="cr-rank">${rank}</span><span class="cr-rev${lose?' lose':''}">${rev}</span></div>
+    <div class="cr-thumb"><div class="cr-fallback">Creative preview<br>(loads from Klaviyo CDN)</div><img loading="lazy" src="${IMG}${c[3]}" alt="${c[0]}"/><span class="cr-view">⤢ View full</span></div>
+    <div class="cr-body">
+      <p class="cr-name">${c[0]}</p>
+      <div class="cr-field"><span class="lbl">Subject</span><span class="subj">${c[1]}</span></div>
+      <div class="cr-field"><span class="lbl">Preview</span><span class="prev">${c[2]}</span></div>
+      ${(c[8]||c[9])?`<div class="cr-eval">${c[8]?`<p><span class="ok">✓ Worked</span> ${c[8]}</p>`:''}${c[9]?`<p><span class="watch">⤳ Consider</span> ${c[9]}</p>`:''}</div>`:''}
+      <div class="cr-metrics">
+        <div class="cr-metric"><div class="m-val">${(c[4]/1000).toFixed(0)}K</div><div class="m-lbl">Sent</div></div>
+        <div class="cr-metric"><div class="m-val">${c[5]}</div><div class="m-lbl">Open</div></div>
+        <div class="cr-metric"><div class="m-val">${c[10]}</div><div class="m-lbl">Clicks</div></div>
+        <div class="cr-metric"><div class="m-val">${c[11]}</div><div class="m-lbl">CTR</div></div>
+        <div class="cr-metric"><div class="m-val">${c[6]}</div><div class="m-lbl">Orders</div></div>
+      </div>
+    </div>
+  </div>`;
+}
+function openLB(idx){
+  const c=CARDS[idx];
+  document.getElementById('lb-name').textContent=c[0];
+  document.getElementById('lb-meta').innerHTML=`<b>${c[1]}</b> — ${c[2]}`;
+  document.getElementById('lb-stats').innerHTML=
+    `<div class="lb-stat"><div class="v">${c[4].toLocaleString()}</div><div class="l">Sent</div></div>
+     <div class="lb-stat"><div class="v">${c[5]}</div><div class="l">Open</div></div>
+     <div class="lb-stat"><div class="v">${c[6]}</div><div class="l">Orders</div></div>
+     <div class="lb-stat"><div class="v">$${c[7].toLocaleString('en-US',{maximumFractionDigits:0})}</div><div class="l">Revenue</div></div>`;
+  const seq=(GAL[c[3]]||[c[3]]).concat(FOOTER);
+  document.getElementById('lb-scroll').innerHTML=seq.map(f=>`<img loading="lazy" src="${IMG}${f}" alt="">`).join('');
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeLB(){document.getElementById('lightbox').classList.remove('open');document.body.style.overflow='';}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLB();});
+
+// ===== Creative channel toggle (Email / SMS) =====
+function setCreative(view,btn){
+  document.querySelectorAll('#tab-creative .cmp-seg button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('cr-email-view').style.display = view==='email'?'block':'none';
+  document.getElementById('cr-sms-view').style.display = view==='sms'?'block':'none';
+  document.getElementById('creative-note').textContent = view==='sms'
+    ? 'SMS creative — message + image as it landed, ranked by revenue'
+    : 'Email creative — top & bottom performers by audience';
+}
+// Audience tabs within email creative
+function setAudience(view,btn){
+  document.querySelectorAll('#aud-seg button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('cr-mens').style.display = view==='mens'?'block':'none';
+  document.getElementById('cr-womens').style.display = view==='womens'?'block':'none';
+  document.getElementById('cr-mixed').style.display = view==='mixed'?'block':'none';
+}
+// SMS creative data: [name, revenue, recipients, clicks, ctr, orders, unsub, mediaFile, body]
+const smsCreative=[
+ ["Mothers Day",5090.74,18082,157,"0.87%",15,47,"","Don't forget Mom. Free express shipping + tote on $300+\n\nCode: FORMOM26\n\nhttps://www.7diamonds.com/collections/mothers-day"],
+ ["Men's Seersucker",4981.78,17629,280,"1.59%",18,35,"7ca6f7b3-fadc-4510-bf68-720f2b924a38.jpeg","Your warm-weather rotation starts here. Explore seersucker stretch styles from polos and camp shirts to shorts, pants, and more.\n\nShop Now:\nhttps://www.7diamonds.com/collections/seersucker-stretch"],
+ ["Men's Denim",4437.34,17770,129,"0.73%",17,51,"beb45653-8609-4f78-a1ed-016081be5e2a.jpeg","Denim that feels broken-in from day one. Meet the Generation™ and Union.\n\nWatch the fit guide:\nhttps://www.youtube.com/watch?v=s9iOdGMJSGM\n\nShop the collection:\nhttps://www.7diamonds.com/collections/denim"],
+ ["Men's Swim",2847.43,6226,100,"1.61%",8,20,"79a22be2-373e-4101-a0ff-f226fbf2fa56.jpeg","Swim season starts here. Shop new trunks designed for pool days, beach weekends, and everything in between.\nhttps://www.7diamonds.com/collections/swim-mens"],
+ ["Men's Pullovers",2075.38,17748,146,"0.82%",11,41,"e520a7b3-44db-45c1-bd1a-cbab27e67f69.jpeg","Back nine layers fitted for your golf game. New men's pullovers have arrived:\nhttps://www.7diamonds.com/collections/pullovers"]
+];
+function smsBody(t){
+  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/(https?:\/\/[^\s]+)/g,'<span class="lnk">$1</span>');
+}
+function smsCard(r,top){
+  const rev='$'+r[1].toLocaleString('en-US',{maximumFractionDigits:0});
+  const rpr=(r[1]/r[2]).toFixed(2);
+  const img=r[7]?`<img loading="lazy" src="${IMG}${r[7]}" alt="">`:'';
+  return `<div class="sms-card">
+    <div class="sms-toprev">${rev}${top?'<span class="badge">Top SMS</span>':''}</div>
+    <div class="sms-cname">MENS – ${r[0]}</div>
+    <div class="phone"><div class="screen">
+      <div class="bar"><span class="notch"></span></div>
+      <div class="from">7Diamonds</div>
+      <div class="thread"><div class="bubble">${img}<div class="txt">${smsBody(r[8])}<span class="optout">Reply STOP to opt out · Msg&amp;data rates may apply</span></div></div></div>
+    </div></div>
+    <div class="sms-metrics">
+      <div class="sms-metric"><div class="v">${r[3]}</div><div class="l">Clicks</div></div>
+      <div class="sms-metric"><div class="v">${r[4]}</div><div class="l">CTR</div></div>
+      <div class="sms-metric"><div class="v">${r[5]}</div><div class="l">Orders</div></div>
+      <div class="sms-metric"><div class="v neg">${r[6]}</div><div class="l">Unsubs</div></div>
+    </div>
+    <div class="sms-foot">${r[2].toLocaleString()} sent · $${rpr}/recipient</div>
+  </div>`;
+}
+document.getElementById('sms-grid').innerHTML=smsCreative.map((r,i)=>smsCard(r,i===0)).join('');
+document.getElementById('sms-extra').innerHTML='<em>Also sent: SMS Men’s Pants — $2,829 · 17,721 recipients · 0.70% CTR · 124 clicks · 14 orders · 58 unsubs. (Message copy couldn’t be retrieved for this build.)</em>';
+
+// ===== Health Report =====
+function ringSVG(score,size,big){
+  const r=big?54:36, sw=big?11:7.5, c=2*Math.PI*r, arc=c*Math.max(0,Math.min(100,score))/100, cx=size/2;
+  const col=score>=75?'#3f7d62':score>=60?'#c79a3e':'#b06a6a';
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+    <circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="#e8e9ec" stroke-width="${sw}"/>
+    <circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="${col}" stroke-width="${sw}" stroke-linecap="round" stroke-dasharray="${arc} ${c}" transform="rotate(-90 ${cx} ${cx})"/>
+    <text x="${cx}" y="${cx}" text-anchor="middle" dominant-baseline="central" font-size="${big?40:23}" font-weight="700" fill="#1f2430">${score}</text>
+  </svg>`;
+}
+function renderHealth(){
+  // Sub-scores (0–100) — composite of May metrics scored vs the benchmarks shown on each card.
+  const sub={email:68,sms:70,flow:90,list:78};
+  const W={flow:.35,email:.30,list:.20,sms:.15};
+  const overall=Math.round(sub.flow*W.flow+sub.email*W.email+sub.list*W.list+sub.sms*W.sms);
+  const band=overall>=75?'Good':overall>=60?'Fair':'Needs attention';
+  const bandCol=overall>=75?'var(--pos)':overall>=60?'#b07d24':'var(--neg)';
+
+  const hero=`<div class="card hs-hero">
+    ${ringSVG(overall,170,true)}
+    <p class="band" style="color:${bandCol}">${band}</p>
+    <p class="sub">Solid retention performance with room to optimize. Flows are exceptional; the opportunity is lifting click-through on email and SMS.</p>
+  </div>`;
+
+  function subcard(score,title,rows,bm,read){
+    return `<div class="hs-card">
+      <div class="ring-wrap">${ringSVG(score,110,false)}</div>
+      <div class="hs-title">${title}</div>
+      <div class="hs-rows">${rows.map(r=>`<div class="r"><span class="k">${r[0]}</span><span class="v ${r[2]||''}">${r[1]}</span></div>`).join('')}</div>
+      <div class="hs-bm">Benchmarks: ${bm}</div>
+      <div class="hs-read">${read}</div>
+    </div>`;
+  }
+  const grid=`<div class="hs-grid">
+    ${subcard(sub.email,'Email Efficiency',[['Open rate','51.7%','ok'],['Click rate','0.33%','warn'],['Unsub rate','0.10%','ok'],['Revenue / recipient','$0.08','warn']],
+      'open 30% · click 1.2% · unsub 0.3% · RPR $0.14','Opens look strong but are inflated by Apple Mail Privacy, so click rate is the truer read — and it sits below benchmark. Retention (unsub) is healthy; the lever is in-email CTAs. RPR here is campaign-only (flows score separately).')}
+    ${subcard(sub.sms,'SMS Efficiency',[['Click rate','0.98%','warn'],['Opt-out rate','0.27%','ok'],['Revenue / recipient','$0.23','ok']],
+      'CTR 3% · opt-out 1.5% · RPR $0.11','Revenue per recipient is ~2× benchmark and opt-outs are very low; click-through is the gap. Reserve SMS for high-intent moments.')}
+    ${subcard(sub.flow,'Flow Performance',[['Flow revenue share','56.2%','ok'],['Active flows','26','ok'],['Revenue / recipient','$4.97','ok'],['YoY revenue','+155%','ok']],
+      'flow share 45% · active flows 8','Flow share and active-flow count are well above benchmark — the engine of the account. The +155% YoY partly reflects new flows launched since May 2025 (e.g. Welcome SMS), not optimization alone.')}
+    ${subcard(sub.list,'List Health',[['Net email','+1,212','ok'],['Net SMS','+187','ok'],['Unsub rate','0.10%','ok'],['Acq : churn (email)','1.6 : 1','ok']],
+      'net growth positive · unsub < 0.3%','Both lists grew net-positive with low churn. Note: signup-form capture rate isn’t measured in this view — worth adding next month.')}
+  </div>`;
+
+  const contrib=`<div class="card hs-contrib" style="margin-top:16px">
+    <h3>Key contributors</h3>
+    <div class="row"><div class="ic" style="background:#eef4f0">⚡</div><div class="lbl"><div class="t">Welcome SMS flow</div><div class="d">Top revenue driver</div></div><div class="val"><div class="t">$62.8K</div><div class="d">33% of flow revenue</div></div></div>
+    <div class="row"><div class="ic" style="background:#eef1f5">✉️</div><div class="lbl"><div class="t">Email open rate</div><div class="d">Engagement</div></div><div class="val"><div class="t">51.7%</div><div class="d">Above benchmark</div></div></div>
+    <div class="row"><div class="ic" style="background:#eef4f0">✓</div><div class="lbl"><div class="t">Unsubscribe rate</div><div class="d">List-fatigue indicator</div></div><div class="val"><div class="t">0.10%</div><div class="d">Healthy</div></div></div>
+  </div>`;
+
+  const yoy=`<div class="grid k2" style="margin-top:16px">
+    <div class="card kpi"><p class="label">Total retention revenue</p><p class="val">$337.7K</p><p class="meta pos" style="color:var(--pos)">▲ +14.0% vs May 2025</p></div>
+    <div class="card kpi"><p class="label">Flow revenue share</p><p class="val">56.2%</p><p class="meta">Flows out-earn campaigns</p></div>
+  </div>`;
+
+  const summary=`<div class="takeaway" style="margin:16px 0 28px">
+    <h4>💡 Health summary</h4>
+    <p style="margin:0;color:#374151">Overall retention health scores <strong>${overall}/100 — ${band}</strong>. May generated <strong>$337.7K</strong> in attributed revenue, up <strong>14% YoY</strong>, with <strong>flows contributing 56%</strong> and scoring a standout 90/100. The two areas with the most headroom are <strong>email and SMS click-through</strong> — both convert and retain well, but click rates sit below benchmark, so the next gain is stronger in-email/in-text CTAs and tighter product focus rather than more volume. List health is solid: both lists grew net-positive with unsub at 0.10%.</p>
+  </div>`;
+
+  const note=`<p class="note" style="margin-top:14px">Scores are a composite of May 2026 metrics graded against the industry benchmarks shown on each card (weighted: Flows 35%, Email 30%, List 20%, SMS 15%). Directional, not an official Klaviyo metric.</p>`;
+
+  document.getElementById('health-body').innerHTML=hero+grid+summary+contrib+yoy+note;
+}
+renderHealth();
+
+document.getElementById('cr-mens').innerHTML=`
+  <div class="sec-head"><h2>Men's</h2><span class="tag">15 sends · $92.6K · 74% of email revenue</span></div>
+  <div class="cr-subhead"><span class="dot"></span>Top 5 by revenue</div>
+  <div class="cr-grid">${mensTop.map((c,i)=>card(c,'#'+(i+1),false)).join('')}</div>
+  <div class="cr-subhead lose"><span class="dot"></span>Bottom 3 by revenue</div>
+  <div class="cr-grid bottom">${mensBottom.map(c=>card(c,'Lowest 3',true)).join('')}</div>`;
+
+document.getElementById('cr-womens').innerHTML=`
+  <div class="sec-head" style="margin-top:34px"><h2>Women's</h2><span class="tag">5 sends · $9.2K · all shown (top 5 = full set)</span></div>
+  <div class="cr-subhead"><span class="dot"></span>All women's sends, ranked by revenue</div>
+  <div class="cr-grid">${womensAll.map((c,i)=>card(c,'#'+(i+1),i>=3)).join('')}</div>
+  <div class="takeaway" style="margin-top:18px">
+    <h4>Women's read</h4>
+    <ul>
+      <li><strong>Pants led</strong> on a clean tailored-product hero and a benefit-led subject ("Tailored Ease"). The two lowest (Dresses, Shorts) leaned on softer hooks and editorial openers.</li>
+      <li><strong>The "Short Shorts. Long Days." creative ran twice</strong> (AM "Shorts" + PM "Shorts PM" resend). Combined they pulled ~$3.1K — the resend is working, but consider a fresh subject for the second touch.</li>
+      <li>Women's is a small slice of revenue but opens are healthy (48–58%) — more frequent, product-specific women's drops to the engaged female segment is the clearest growth lever.</li>
+    </ul>
+  </div>`;
+
+document.getElementById('cr-mixed').innerHTML=`
+  <div class="sec-head" style="margin-top:34px"><h2>Full List / Mixed</h2><span class="tag">6 sends · $22.3K · mostly Mother's Day</span></div>
+  <div class="cr-subhead"><span class="dot"></span>All 6 sends, ranked by revenue (only 6 ran, so top 5 = nearly the full set)</div>
+  <div class="cr-grid">${mixedAll.map((c,i)=>card(c,'#'+(i+1),i>=4)).join('')}</div>
+  <div class="takeaway" style="margin-top:18px">
+    <h4>Full-list / Mixed read</h4>
+    <ul>
+      <li><strong>Offer + urgency won.</strong> "Last Call for Mom" with overnight shipping and a free-tote threshold was the strongest broad send; the plain "Gifts for Mom" / "Happy Mother's Day" openers sat at the bottom.</li>
+      <li><strong>Broad sends are low-efficiency by nature</strong> — all six went to ~83K recipients but converted at roughly half the rate of targeted men's drops. Keep these for tentpole moments and pair with a clear incentive.</li>
+      <li><strong>"It's Heating Up" (Resort)</strong> had the widest reach (84K) but a vague subject and lifestyle hero — a sharper, product-named subject could lift it materially.</li>
+    </ul>
+  </div>`;
+</script>
+</body>
+</html>

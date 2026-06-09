@@ -82,6 +82,18 @@ const routes: RouteRecordRaw[] = [
     meta: { requiresAuth: true, title: 'Report' },
   },
   {
+    path: '/reports/retention',
+    name: 'retention-reports',
+    component: () => import('@/views/RetentionReportsView.vue'),
+    meta: { requiresAuth: true, title: 'Retention Reports' },
+  },
+  {
+    path: '/reports/retention/:reportId',
+    name: 'retention-report-detail',
+    component: () => import('@/views/RetentionReportDetailView.vue'),
+    meta: { requiresAuth: true, title: 'Retention Report' },
+  },
+  {
     path: '/settings',
     name: 'settings',
     component: () => import('@/views/SettingsView.vue'),

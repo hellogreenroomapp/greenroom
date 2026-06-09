@@ -390,6 +390,11 @@
       </div>
     </div>
 
+    <!-- Retention Reports Section (brand owner only) -->
+    <div v-if="currentBrand && isBrandOwner" class="bg-card border border-border rounded-lg p-6">
+      <RetentionReportsSettings />
+    </div>
+
     <!-- Rewards Breakdown Section -->
     <div v-if="currentBrand" class="bg-card border border-border rounded-lg p-6">
       <RewardsBreakdown />
@@ -415,6 +420,7 @@ import BrandSettings from '@/components/brand/BrandSettings.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 import RewardsSettings from '@/components/rewards/RewardsSettings.vue'
 import RewardsBreakdown from '@/components/rewards/RewardsBreakdown.vue'
+import RetentionReportsSettings from '@/components/retention/RetentionReportsSettings.vue'
 
 const brandStore = useBrandStore()
 const authStore = useAuthStore()
@@ -422,6 +428,9 @@ const { updateBrand, ownedBrands, invitedBrands, selectBrand } = useBrand()
 const toast = useToast()
 
 const currentBrand = computed(() => brandStore.currentBrand)
+const isBrandOwner = computed(
+  () => !!currentBrand.value && currentBrand.value.ownerId === authStore.user?.uid
+)
 const userProfile = computed(() => authStore.userProfile)
 const isEditing = ref(false)
 const isEditingProfile = ref(false)
