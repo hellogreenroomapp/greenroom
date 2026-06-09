@@ -153,6 +153,28 @@
   .sms-foot{font-size:11px;color:var(--faint);margin-top:8px;text-align:center}
   @media(max-width:780px){.sms-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
   @media(max-width:520px){.sms-grid{grid-template-columns:1fr}}
+  /* Enrollment form section */
+  .col-mom,.col-yoy{display:none}
+  .fdelta{font-size:11px;font-weight:600;display:block;margin-top:1px}
+  .fdelta.up{color:var(--pos)}.fdelta.down{color:var(--neg)}
+  .signup-wrap{display:flex;flex-direction:column;align-items:center}
+  .su-phone{width:240px;background:#1f2430;border-radius:34px;padding:9px;box-shadow:0 12px 30px rgba(31,36,48,.16)}
+  .su-screen{background:#fff;border-radius:27px;overflow:hidden}
+  .su-bar{position:relative;height:24px;background:#f3f4f6}
+  .su-bar .notch{position:absolute;top:8px;left:50%;transform:translateX(-50%);width:42px;height:5px;background:#cfd2d8;border-radius:3px}
+  .su-hero{position:relative;height:188px;background:#cddde2 url('https://d3k81ch9hvuctc.cloudfront.net/company/TSt5zk/images/cac1d61b-7c2a-4094-b526-5b72f2ac0417.jpeg') center top/cover no-repeat}
+  .su-x{position:absolute;top:8px;right:11px;color:#1f2430;font-size:14px;opacity:.85;line-height:1;text-shadow:0 1px 2px rgba(255,255,255,.6)}
+  .su-modal{padding:18px 20px 20px;text-align:center}
+  .su-logo{font-size:13px;font-weight:600;letter-spacing:.06em;color:#1f2430;margin-bottom:14px}
+  .su-h{font-size:18px;font-weight:800;letter-spacing:-.01em;color:#2a2f3a;line-height:1.12;margin:0 0 8px}
+  .su-sub{font-size:11px;color:#6b7280;line-height:1.45;margin:0 0 14px}
+  .su-pref{font-size:12.5px;font-weight:700;color:#1f2430;margin:0 0 9px}
+  .su-radios{display:flex;justify-content:center;gap:13px;font-size:11px;color:#1f2430;margin-bottom:14px}
+  .su-radios span{display:inline-flex;align-items:center;gap:4px}
+  .su-radios i{width:10px;height:10px;border:1px solid #9aa0a8;border-radius:50%;display:inline-block}
+  .su-input{border:1px solid #c9ccd3;border-radius:2px;font-size:12px;color:#9aa0a8;padding:11px 12px;text-align:left;margin-bottom:9px}
+  .su-btn{background:#1f2430;color:#fff;font-size:12px;font-weight:600;letter-spacing:.12em;border-radius:2px;padding:12px;text-align:center}
+  .su-skip{font-size:10.5px;font-weight:600;letter-spacing:.08em;color:#1f2430;margin-top:14px}
   @media(max-width:840px){.cr-grid,.cr-grid.bottom{grid-template-columns:repeat(2,1fr)}}
   @media(max-width:560px){.cr-grid,.cr-grid.bottom{grid-template-columns:1fr}}
   .cr-card{cursor:pointer;transition:box-shadow .15s,transform .15s}
@@ -317,8 +339,8 @@
       <li><strong>Best individual performers</strong> were men's bottoms and swim: Short Sleeve Shirts ($11.1K), Swim Edit 02 ($9.8K), and Generation Pants ($8.4K) led the month.</li>
       <li><strong>SMS punches above its weight.</strong> At $0.23 revenue/recipient vs $0.08 for email, reserve SMS for marquee launches and time-sensitive offers rather than broad sends.</li>
       <li><strong>Mother's Day full-list sends</strong> delivered reach and strong opens (46–47%) but low click/conversion — broad "edit" emails work better as awareness than as direct-response. Consider tighter product focus or a clearer offer next year.</li>
-      <li><strong>Women's is small but growing in engagement</strong> ( ~$10.8K). Continue with caddence and focus new key women's categories to keep growing the engaged female segment.</li>
-      <li><strong>Why the low performers lagged — it's product &amp; audience, not timing.</strong> The weakest men's send, Pullovers ($2.9K), still opened at 58% but barely converted — a warm-layer product landing in late-May warm-weather demand while swim, shorts and pants were winning. Time edits with seasonally appropriate items to grow conversion. Women's sends cap lower mainly on <em>audience size</em> (a ~33–48K engaged-female base vs ~60–84K for men's), not creative. Day-of-week showed no clear penalty — the two Sunday-noon sends (Generation Pants and SWIM) were both top-five performers. The softest subject lines were the generic full-list ones ("Gifts for Mom," "Happy Mother's Day") rather than the product-named men's drops.</li>
+      <li><strong>Women's &amp; wholesale are under-leveraged</strong> (combined ~$10.8K). Test more frequent women's category drops to the engaged female segment.</li>
+      <li><strong>Why the low performers lagged — it's product &amp; audience, not timing.</strong> The weakest men's send, Pullovers ($2.9K), still opened at 58% but barely converted — a warm-layer product landing in late-May warm-weather demand while swim, shorts and pants were winning. Women's sends cap lower mainly on <em>audience size</em> (a ~33–48K engaged-female base vs ~60–84K for men's), not creative. Day-of-week showed no clear penalty — the two Sunday-noon sends (Generation Pants and SWIM) were both top-five performers. The softest subject lines were the generic full-list ones ("Gifts for Mom," "Happy Mother's Day") rather than the product-named men's drops.</li>
     </ul>
   </div>
 
@@ -329,7 +351,7 @@
       <li><strong>Heavy cadence, healthy list.</strong> May ran ~34 email + 6 SMS sends (more than one a day), yet unsubscribe rate held at ~0.10% and delivery at 99.6%. The disciplined exclusions on nearly every send — recent purchasers (7 &amp; 30 day), bounce-risk and SMS-error profiles — protected the base despite the volume.</li>
       <li><strong>The pant/denim affinity segment did the heavy lifting — and the most sends.</strong> Six pant/denim drops hit that segment in May (5-Pocket, Infinity, Zuma, Generation Pants, Generation Denim, Union Denim). Performance held, but it's the first segment to watch for fatigue — space these out or rotate categories.</li>
       <li><strong>Resends are working as a second touch.</strong> The Seersucker resend to non-openers added ~$4.7K, and the women's Shorts AM→PM split recovered extra orders. Both reused the original subject, though — varying the subject line on the second touch is the easy win left on the table.</li>
-      <li><strong>Weekends convert.</strong> The Saturday and Sunday-noon sends ranked among the month's strongest, so the calendar should treat weekends as prime real estate for some of our strongest content pieces.</li>
+      <li><strong>Weekends are fair game for this list.</strong> Saturday (Zuma) and the two Sunday-noon sends (Generation Pants and SWIM) performed in line with weekday drops — no weekend penalty, so the calendar can flex around demand rather than avoiding weekends.</li>
     </ul>
   </div>
 </section>
@@ -395,6 +417,81 @@
       <li><strong>Email churn is concentrated in flows &amp; high-frequency sends.</strong> Welcome Series (175 unsubs) and broad full-list sends carry most opt-outs; tightening segmentation can preserve growth.</li>
       <li><strong>SMS unsubs climbed in weeks 4–5</strong> alongside more frequent texting. Cap SMS frequency and keep suppressing recent purchasers / unengaged to protect the smaller, higher-value list.</li>
       <li><strong>Capitalize on the Mother's Day acquisition spike</strong> — the early-May cohort (1,380 email subs in one week) should be flowing through the Welcome series; ensure that handoff is well-tuned given Welcome's outsized revenue.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ ENROLLMENT FORMS ============ -->
+<section>
+  <div class="sec-head"><h2>Enrollment Forms</h2><span class="tag">Sign-up form performance · toggle Compare above for MoM / YoY</span></div>
+
+  <div class="grid k3">
+    <div class="card kpi"><p class="label">Form impressions</p><p class="val">114.2K</p><p class="meta">Times a sign-up form was shown</p><p class="kpi-delta" data-mom="25.5" data-yoy="133.8"></p></div>
+    <div class="card kpi"><p class="label">Sign-ups (submissions)</p><p class="val">3,193</p><p class="meta">≈ 95% of new email subscribers</p><p class="kpi-delta" data-mom="-4.9" data-yoy="94.9"></p></div>
+    <div class="card kpi"><p class="label">Submission rate</p><p class="val">2.79%</p><p class="meta">Submissions ÷ impressions</p><p class="kpi-delta" data-mom="-24.4" data-yoy="-16.6"></p></div>
+  </div>
+
+  <p style="margin-top:24px"><strong>Forms are the brand's primary acquisition engine</strong> — May's ~3,193 sign-ups account for roughly 95% of new email subscribers. Traffic to the forms surged: impressions were up <strong>+134% YoY</strong> (and +26% vs April), so far more people are seeing the form. The catch is conversion — the <strong>submission rate slipped to 2.79%</strong> (from 3.69% in April and 3.35% a year ago) and sits below the ~6% target used in the Health score. In short: sign-ups are growing on volume, not efficiency, so improving form conversion is the single clearest lever for list growth.</p>
+
+  <div class="split">
+    <div class="card">
+      <h3>Form metrics — period comparison</h3>
+      <table>
+        <thead><tr><th>Metric</th><th>May 2026</th><th class="col-mom">Apr 2026 (MoM)</th><th class="col-yoy">May 2025 (YoY)</th></tr></thead>
+        <tbody>
+          <tr><td class="name">Impressions</td><td>114,245</td><td class="col-mom">91,066<span class="fdelta up">▲ +25.5%</span></td><td class="col-yoy">48,857<span class="fdelta up">▲ +133.8%</span></td></tr>
+          <tr><td class="name">Sign-ups</td><td>3,193</td><td class="col-mom">3,359<span class="fdelta down">▼ −4.9%</span></td><td class="col-yoy">1,638<span class="fdelta up">▲ +94.9%</span></td></tr>
+          <tr><td class="name">Submission rate</td><td>2.79%</td><td class="col-mom">3.69%<span class="fdelta down">▼ −0.90 pts</span></td><td class="col-yoy">3.35%<span class="fdelta down">▼ −0.56 pts</span></td></tr>
+          <tr><td class="name">Share of new email subs</td><td>~95%</td><td class="col-mom">—</td><td class="col-yoy">—</td></tr>
+        </tbody>
+      </table>
+      <p class="note">Toggle <strong>Compare revenue</strong> at the top of the dashboard to reveal the MoM or YoY column and card deltas. Form data uses event-time aggregation; "submission rate" is submissions ÷ impressions.</p>
+    </div>
+    <div class="card signup-wrap">
+      <h3 style="align-self:flex-start">Mobile sign-up form</h3>
+      <div class="su-phone"><div class="su-screen">
+        <div class="su-bar"><span class="notch"></span></div>
+        <div class="su-hero"><span class="su-x">✕</span></div>
+        <div class="su-modal">
+          <div class="su-logo">7 D I A M O N D S</div>
+          <p class="su-h">10% OFF YOUR<br>FIRST PURCHASE</p>
+          <p class="su-sub">Sign up for our newsletter for new arrivals and exclusive content.</p>
+          <p class="su-pref">Product Preference</p>
+          <div class="su-radios"><span><i></i> Men's</span><span><i></i> Women's</span><span><i></i> All</span></div>
+          <div class="su-input">Email</div>
+          <div class="su-btn">SUBMIT</div>
+          <div class="su-skip">NO THANK YOU</div>
+        </div>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h3>Performance by form</h3>
+    <table>
+      <thead><tr><th>Form</th><th>Device / type</th><th>Impressions</th><th>Sign-ups</th><th>Submit rate</th></tr></thead>
+      <tbody>
+        <tr><td class="name">Email Enrollment V2 — Mobile (A/B test)</td><td>Mobile · pop-up</td><td>73,928</td><td>1,266</td><td>1.71%</td></tr>
+        <tr><td class="name">Email Enrollment V2 — Mobile (SMS opt-in)</td><td>Mobile · SMS</td><td>4,948</td><td>992</td><td><span style="color:var(--pos);font-weight:600">20.05%</span></td></tr>
+        <tr><td class="name">Enrollment V2 — Mobile on-exit</td><td>Mobile · exit-intent</td><td>16,078</td><td>360</td><td>2.24%</td></tr>
+        <tr><td class="name">Email Enrollment V1 — Desktop</td><td>Desktop · pop-up</td><td>12,641</td><td>325</td><td>2.57%</td></tr>
+        <tr><td class="name">Email Enrollment V1 — Desktop (SMS)</td><td>Desktop · SMS</td><td>1,395</td><td>117</td><td><span style="color:var(--pos);font-weight:600">8.39%</span></td></tr>
+        <tr><td class="name">Email Enrollment V1 — Desktop on-exit</td><td>Desktop · exit-intent</td><td>5,223</td><td>115</td><td>2.20%</td></tr>
+        <tr><td class="name">Other / minor form</td><td>—</td><td>32</td><td>18</td><td>56.3%</td></tr>
+      </tbody>
+    </table>
+    <p class="note">Form names derived from the sign-up source recorded on each submission (the form's design isn't exposed via the API). Ordered by sign-ups; "submit rate" is sign-ups ÷ impressions. Multi-step forms count the SMS opt-in/code step, which lifts their rate.</p>
+  </div>
+
+  <div class="takeaway">
+    <h4>Takeaways — Enrollment Forms</h4>
+    <ul>
+      <li><strong>Forms drive the list.</strong> ~95% of May's new email subscribers came through sign-up forms — this is the top of the funnel worth protecting and optimizing.</li>
+      <li><strong>The main mobile pop-up sets the blended rate.</strong> "V2 Mobile (A/B test)" carries the traffic — 73.9K impressions, but a 1.7% submit rate — which is what drags the overall 2.79% down. The high-volume pop-up is the single biggest place a conversion lift would compound.</li>
+      <li><strong>The SMS opt-in form is the efficiency standout.</strong> "V2 Mobile (SMS)" converts at ~20% (and Desktop SMS at ~8%) — far above the pop-ups. Worth studying what makes these work (offer, fewer fields, intent) and porting it to the main pop-up.</li>
+      <li><strong>Reach is way up.</strong> Impressions +134% YoY / +26% MoM means more traffic is hitting the form (paid, seasonal, or campaign-driven) — a real opportunity if conversion holds.</li>
+      <li><strong>Conversion is the gap.</strong> Submission rate fell to 2.79% (below the ~6% target). With this much traffic, even a small rate lift compounds — test the offer, timing/trigger, fields (the phone field may add friction), and mobile UX.</li>
+      <li><strong>Net positive, on volume.</strong> Sign-ups are still up +95% YoY — growth is real, just powered by reach rather than efficiency. Closing the rate gap is the upside.</li>
     </ul>
   </div>
 </section>
@@ -632,6 +729,9 @@ function setCmp(mode,btn){
     const vsLabel=mode==='mom'?'vs Apr':'vs May ’25';
     el.innerHTML=`${arrow} ${up?'+':''}${v.toFixed(1)}% <span class="vs">${vsLabel}</span>`;
   });
+  // Enrollment-form table comparison columns
+  document.querySelectorAll('.col-mom').forEach(e=>e.style.display = mode==='mom'?'':'none');
+  document.querySelectorAll('.col-yoy').forEach(e=>e.style.display = mode==='yoy'?'':'none');
 }
 
 // ===== Tabs =====

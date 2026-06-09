@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>7Diamonds — May 2026 Klaviyo Performance · Slides</title>
+<!--
+  Slide-deck version of the May 2026 report, formatted for Figma import.
+  Each .slide is a fixed 1920x1080 frame. No JS, no <canvas> — charts are
+  plain HTML/CSS so html.to.design imports everything as editable layers.
+-->
+<style>
+  :root{
+    --bg:#f7f7f8; --card:#ffffff; --ink:#1f2430; --muted:#6b7280; --faint:#9ca3af;
+    --line:#e8e9ec; --line2:#f0f1f3; --email:#3b4252; --sms:#9aa3b2; --pos:#3f7d62; --neg:#b06a6a;
+    --accent:#2f3645; --gold:#caa53a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#dcdee3;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.45;
+    /* Comfortable default viewing size; slides stay 1920x1080 in CSS px */
+    zoom:.8}
+  .deck{display:flex;flex-direction:column;align-items:center;gap:60px;padding:60px 0}
+  .slide{width:1920px;height:1080px;background:var(--bg);overflow:hidden;position:relative;
+    padding:90px 110px;display:flex;flex-direction:column;flex:none}
+  .slide-label{position:absolute;bottom:34px;right:110px;font-size:18px;color:var(--faint);letter-spacing:.08em}
+  .brandmark{display:flex;align-items:center;gap:18px}
+  .logo{width:64px;height:64px;border-radius:16px;background:var(--accent);color:#fff;display:flex;
+    align-items:center;justify-content:center;font-weight:700;font-size:28px;letter-spacing:-.5px}
+  .brandmark .bn{font-size:26px;font-weight:600}
+  .brandmark .bn span{color:var(--faint);font-weight:400}
+  .eyebrow{font-size:20px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-bottom:14px}
+  h1{font-size:88px;font-weight:650;letter-spacing:-.02em;line-height:1.08}
+  h2{font-size:52px;font-weight:650;letter-spacing:-.015em}
+  h3{font-size:26px;font-weight:600;color:var(--accent)}
+  .sub{font-size:28px;color:var(--muted)}
+  .sec-head{display:flex;align-items:baseline;gap:22px;border-bottom:2px solid var(--line);padding-bottom:22px;margin-bottom:44px}
+  .sec-head .tag{font-size:22px;color:var(--faint)}
+  .row{display:flex;gap:28px}
+  .col{display:flex;flex-direction:column;gap:28px}
+  .grow{flex:1;min-width:0}
+  .card{background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:30px 34px}
+  .kpis{display:flex;gap:26px}
+  .kpi{flex:1}
+  .kpi .label{font-size:20px;color:var(--muted);margin-bottom:10px}
+  .kpi .val{font-size:52px;font-weight:650;letter-spacing:-.02em}
+  .kpi .val.pos{color:var(--pos)}
+  .kpi .meta{font-size:18px;color:var(--faint);margin-top:8px}
+  p.body{font-size:24px;color:#374151;line-height:1.55}
+  .takeaway{background:#fbfbfc;border:1.5px solid var(--line);border-left:6px solid var(--accent);
+    border-radius:14px;padding:26px 32px}
+  .takeaway h4{font-size:19px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+  .takeaway ul{list-style:none}
+  .takeaway li{font-size:21px;color:#374151;line-height:1.5;padding-left:26px;position:relative;margin-bottom:12px}
+  .takeaway li:before{content:"•";position:absolute;left:6px;color:var(--accent)}
+  .takeaway li:last-child{margin-bottom:0}
+  .takeaway.gold{border-left-color:var(--gold);background:#fdfaf0}
+  .takeaway.gold h4{color:#8a6d1f}
+  .takeaway.green{border-left-color:var(--pos);background:#f4f8f6}
+  .takeaway.green h4{color:var(--pos)}
+  .pos{color:var(--pos);font-weight:650}.neg{color:var(--neg);font-weight:650}
+  table{width:100%;border-collapse:collapse;font-size:21px}
+  th,td{text-align:right;padding:14px 16px;border-bottom:1.5px solid var(--line2)}
+  th:first-child,td:first-child{text-align:left}
+  thead th{font-size:16px;text-transform:uppercase;letter-spacing:.07em;color:var(--faint);font-weight:600;border-bottom:2px solid var(--line)}
+  td.name{font-weight:550}
+  td.name .subj{font-style:italic;font-weight:400;color:var(--muted);font-size:17px;margin-top:3px}
+  td.u{color:var(--neg);font-weight:550}
+  table.compact th,table.compact td{padding:8px 14px}
+  table.forms th,table.forms td{padding:8px 9px}
+  table.compact td.name{font-size:19px}
+  table.compact td.name .subj{font-size:15px;margin-top:1px}
+  /* CSS bar charts */
+  .bars{display:flex;flex-direction:column;gap:18px}
+  .bar-row{display:flex;align-items:center;gap:20px}
+  .bar-row .bl{width:300px;font-size:21px;color:#374151;text-align:right;flex:none}
+  .bar-row .btrack{flex:1;display:flex;align-items:center;gap:14px}
+  .bar-row .bfill{height:42px;border-radius:8px;background:var(--accent)}
+  .bar-row .bv{font-size:20px;font-weight:650;white-space:nowrap}
+  .bar-row .bv .rpr{font-weight:500;color:var(--pos);font-size:17px}
+  /* stacked split bar */
+  .split-bar{display:flex;height:64px;border-radius:12px;overflow:hidden;font-size:21px;color:#fff;font-weight:600}
+  .split-bar .seg{display:flex;align-items:center;justify-content:center;gap:8px}
+  .legend{display:flex;gap:30px;font-size:19px;color:var(--muted);margin-top:14px}
+  .legend .sw{display:inline-block;width:18px;height:18px;border-radius:5px;margin-right:8px;vertical-align:-2px}
+  /* vertical bars (subscribers) */
+  .vchart{display:flex;align-items:flex-end;gap:34px;height:360px;padding-top:10px}
+  .vgroup{flex:1;display:flex;flex-direction:column;align-items:center;gap:10px;height:100%}
+  .vbars{display:flex;align-items:flex-end;gap:8px;flex:1;width:100%;justify-content:center}
+  .vbar{width:54px;border-radius:8px 8px 0 0}
+  .vbar.subs{background:var(--email)}
+  .vbar.unsubs{background:#c9a3a3}
+  .vlabel{font-size:19px;color:var(--muted)}
+  .vnum{font-size:16px;color:var(--faint);text-align:center}
+  /* creative cards */
+  .cr-grid{display:flex;gap:26px}
+  .cr-card{background:var(--card);border:1.5px solid var(--line);border-radius:16px;overflow:hidden;
+    display:flex;flex-direction:column;flex:1;min-width:0}
+  .cr-card.lose{border-color:#e3cfcf}
+  .cr-rankbar{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;
+    border-bottom:1.5px solid var(--line2);font-size:19px}
+  .cr-rank{font-weight:650;color:var(--accent)}
+  .cr-rev{font-weight:650;color:var(--pos)}
+  .cr-rev.lose{color:var(--neg)}
+  .cr-thumb{background:#f0f1f3;height:300px;overflow:hidden;border-bottom:1.5px solid var(--line2)}
+  .cr-thumb img{width:100%;height:100%;object-fit:cover;object-position:top center;display:block}
+  .cr-body{padding:18px 20px;display:flex;flex-direction:column;gap:10px;flex:1}
+  .cr-name{font-size:20px;font-weight:650}
+  .cr-subj{font-size:18px;color:var(--ink)}
+  .cr-subj .lbl,.cr-read .lbl{display:block;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-bottom:3px}
+  .cr-read{font-size:16.5px;color:#4b5563;line-height:1.45}
+  .cr-read .ok{color:var(--pos);font-weight:650}
+  .cr-metrics{display:flex;margin-top:auto;border-top:1.5px solid var(--line2);padding-top:14px}
+  .cr-metric{flex:1;text-align:center;border-right:1.5px solid var(--line2)}
+  .cr-metric:last-child{border-right:none}
+  .cr-metric .m-val{font-size:21px;font-weight:650}
+  .cr-metric .m-lbl{font-size:13px;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);margin-top:2px}
+  /* sms phone */
+  .phone{background:#0f1115;border-radius:30px;padding:16px 14px 20px;width:100%}
+  .phone .from{color:#9aa3b2;font-size:16px;text-align:center;margin:8px 0 12px}
+  .phone .bubble{background:#262a33;border-radius:18px;padding:14px;color:#e8eaee;font-size:16.5px;line-height:1.45;white-space:pre-line}
+  .phone .bubble img{width:100%;border-radius:10px;margin-bottom:10px;display:block}
+  .phone .lnk{color:#8ab4f8;word-break:break-all}
+  /* sign-up form mockup */
+  .su-phone{width:250px;background:#1f2430;border-radius:36px;padding:9px;box-shadow:0 14px 34px rgba(31,36,48,.16);flex:none}
+  .su-screen{background:#fff;border-radius:29px;overflow:hidden}
+  .su-bar{position:relative;height:24px;background:#f3f4f6}
+  .su-bar .snotch{position:absolute;top:8px;left:50%;transform:translateX(-50%);width:46px;height:5px;background:#cfd2d8;border-radius:3px}
+  .su-hero{position:relative;height:172px;background:#cddde2 url('https://d3k81ch9hvuctc.cloudfront.net/company/TSt5zk/images/cac1d61b-7c2a-4094-b526-5b72f2ac0417.jpeg') center top/cover no-repeat}
+  .su-x{position:absolute;top:8px;right:12px;color:#1f2430;font-size:15px;opacity:.85;line-height:1;text-shadow:0 1px 2px rgba(255,255,255,.6)}
+  .su-modal{padding:16px 18px 18px;text-align:center}
+  .su-logo{font-size:13px;font-weight:600;letter-spacing:.06em;color:#1f2430;margin-bottom:11px}
+  .su-h{font-size:18px;font-weight:800;letter-spacing:-.01em;color:#2a2f3a;line-height:1.12;margin:0 0 8px}
+  .su-sub{font-size:11.5px;color:#6b7280;line-height:1.4;margin:0 0 11px}
+  .su-pref{font-size:13px;font-weight:700;color:#1f2430;margin:0 0 8px}
+  .su-radios{display:flex;justify-content:center;gap:13px;font-size:11.5px;color:#1f2430;margin-bottom:11px}
+  .su-radios span{display:inline-flex;align-items:center;gap:4px}
+  .su-radios i{width:11px;height:11px;border:1.5px solid #9aa0a8;border-radius:50%;display:inline-block}
+  .su-input{border:1.5px solid #c9ccd3;border-radius:2px;font-size:12px;color:#9aa0a8;padding:10px 12px;text-align:left;margin-bottom:8px}
+  .su-btn{background:#1f2430;color:#fff;font-size:12px;font-weight:600;letter-spacing:.12em;border-radius:2px;padding:11px;text-align:center}
+  .su-skip{font-size:11px;font-weight:600;letter-spacing:.08em;color:#1f2430;margin-top:11px}
+  /* health rings (CSS) */
+  .ring{border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none}
+  .ring .inner{background:var(--card);border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .ring .score{font-weight:700;letter-spacing:-.02em}
+  .ring .of{font-size:18px;color:var(--faint)}
+  .stat-strip{display:flex;gap:70px;margin-top:auto;border-top:2px solid var(--line);padding-top:44px}
+  .stat-strip .v{font-size:54px;font-weight:650;letter-spacing:-.02em}
+  .stat-strip .v.pos{color:var(--pos)}
+  .stat-strip .l{font-size:21px;color:var(--muted);margin-top:6px}
+  .foot-note{font-size:18px;color:var(--faint);line-height:1.5}
+  .chip{display:inline-block;font-size:18px;color:var(--muted);background:#fff;border:1.5px solid var(--line);border-radius:24px;padding:8px 20px;margin-right:12px}
+  .chip.pos{color:var(--pos);border-color:#cfe2d8;background:#f4f8f6}
+</style>
+</head>
+<body>
+<div class="deck">
+
+<!-- ============ SLIDE 1 · COVER ============ -->
+<section class="slide" id="slide-01-cover">
+  <div class="brandmark">
+    <div class="logo">7D</div>
+    <p class="bn">7Diamonds <span>· Retention &amp; Lifecycle</span></p>
+  </div>
+  <div style="margin-top:150px">
+    <p class="eyebrow">Klaviyo Performance Report</p>
+    <h1>May 2026<br>Monthly Review</h1>
+    <p class="sub" style="margin-top:30px">Email &amp; SMS · Campaigns, Flows &amp; Subscriber Growth<br>
+      Reporting window May 1–31, 2026 · Conversion metric: Placed Order (Shopify) · USD</p>
+  </div>
+  <div class="stat-strip">
+    <div><div class="v">$337.7K</div><div class="l">Attributed revenue</div></div>
+    <div><div class="v pos">▲ +14.0%</div><div class="l">YoY revenue</div></div>
+    <div><div class="v">56%</div><div class="l">From flows</div></div>
+    <div><div class="v pos">+1,399</div><div class="l">Net list growth</div></div>
+    <div><div class="v">78<span style="font-size:30px;color:var(--faint)">/100</span></div><div class="l">Retention health · Good</div></div>
+  </div>
+  <span class="slide-label">7Diamonds · May 2026 · 01</span>
+</section>
+
+<!-- ============ SLIDE 2 · AT A GLANCE ============ -->
+<section class="slide" id="slide-02-at-a-glance">
+  <div class="sec-head"><h2>At a Glance</h2><span class="tag">Total attributed revenue across all sends</span></div>
+  <div class="kpis">
+    <div class="card kpi"><p class="label">Total attributed revenue</p><p class="val">$337.7K</p><p class="meta">Campaigns + flows, email &amp; SMS · <span class="pos">▲ +14.0% YoY</span></p></div>
+    <div class="card kpi"><p class="label">Campaign revenue</p><p class="val">$147.9K</p><p class="meta">40 sends · 1.73M recipients</p></div>
+    <div class="card kpi"><p class="label">Flow revenue</p><p class="val">$189.7K</p><p class="meta">20 active messages · always-on</p></div>
+    <div class="card kpi"><p class="label">Net list growth</p><p class="val pos">+1,399</p><p class="meta">Email +1,212 · SMS +187</p></div>
+  </div>
+  <div class="row" style="margin-top:34px">
+    <div class="card grow">
+      <h3 style="margin-bottom:24px">Revenue mix — Campaigns vs Flows</h3>
+      <div class="split-bar">
+        <div class="seg" style="flex:56.2;background:var(--email)">Flows · $189.7K</div>
+        <div class="seg" style="flex:43.8;background:var(--sms)">Campaigns · $147.9K</div>
+      </div>
+      <p class="legend"><span><span class="sw" style="background:var(--email)"></span>Flows 56.2%</span>
+        <span><span class="sw" style="background:var(--sms)"></span>Campaigns 43.8%</span></p>
+    </div>
+    <div class="card grow">
+      <h3 style="margin-bottom:24px">Revenue by channel</h3>
+      <div class="split-bar">
+        <div class="seg" style="flex:69.1;background:var(--email)">Email · $233.4K</div>
+        <div class="seg" style="flex:30.9;background:var(--sms)">SMS · $104.2K</div>
+      </div>
+      <p class="legend"><span><span class="sw" style="background:var(--email)"></span>Email (campaigns + flows)</span>
+        <span><span class="sw" style="background:var(--sms)"></span>SMS (campaigns + flows)</span></p>
+    </div>
+  </div>
+  <p class="body" style="margin-top:36px">May was a high-cadence month built around two pillars: a <strong>Mother's Day full-list push</strong> in the first week and a steady drumbeat of <strong>men's product-category drops</strong> (seersucker, linen, pants, swim, denim, polos) through the rest of the month. Flows quietly out-earned campaigns, generating <strong>56% of total attributed revenue</strong> from just 38K recipients — automated, high-intent touchpoints remain the most efficient revenue per send. Campaign volume was heavy (1.73M total recipients) but broadcast-style, so revenue-per-recipient stayed low while reach and top-of-funnel engagement stayed strong.</p>
+  <span class="slide-label">7Diamonds · May 2026 · 02</span>
+</section>
+
+<!-- ============ SLIDE 3 · CAMPAIGNS OVERVIEW ============ -->
+<section class="slide" id="slide-03-campaigns">
+  <div class="sec-head"><h2>Campaigns</h2><span class="tag">What we sent &amp; who we sent it to</span></div>
+  <div class="kpis">
+    <div class="card kpi"><p class="label">Campaigns sent</p><p class="val">40</p><p class="meta">34 email · 6 SMS</p></div>
+    <div class="card kpi"><p class="label">Total recipients</p><p class="val">1.73M</p><p class="meta">Email 1.64M · SMS 95.2K</p></div>
+    <div class="card kpi"><p class="label">Campaign revenue</p><p class="val">$147.9K</p><p class="meta">Email $125.7K · SMS $22.3K</p></div>
+    <div class="card kpi"><p class="label">Conversions</p><p class="val">606</p><p class="meta">Email 523 · SMS 83</p></div>
+  </div>
+  <div class="row" style="margin-top:34px;flex:1">
+    <div class="col grow" style="flex:1.15">
+      <div class="card grow">
+        <h3 style="margin-bottom:8px">Strategy: what went out</h3>
+        <p class="body" style="font-size:22px">Early May leaned into <strong>Mother's Day</strong> with four full-list "Edit" sends plus an SMS push, then pivoted almost entirely to <strong>men's category storytelling</strong> — each send targeting a product-affinity segment (Pant, Polo, Short-Sleeve, Denim affinity) layered on a 180-day engaged-email base. Women's sends went to predicted-female segments. Nearly every send excluded recent purchasers, bounce-risk subscribers and SMS-error profiles — disciplined list hygiene that protects deliverability.</p>
+      </div>
+    </div>
+    <div class="card grow" style="flex:1.3">
+      <h3 style="margin-bottom:6px">Email revenue by merchandising category</h3>
+      <p style="font-size:18px;color:var(--faint);margin-bottom:26px">Green labels = revenue per recipient · wholesale excluded</p>
+      <div class="bars">
+        <div class="bar-row"><span class="bl">Men's · 15 sends</span><div class="btrack"><div class="bfill" style="width:100%;background:#2f3645"></div><span class="bv">$92.6K <span class="rpr">$0.100/recip</span></span></div></div>
+        <div class="bar-row"><span class="bl">Full / Mixed · 6 sends</span><div class="btrack"><div class="bfill" style="width:24%;background:#5b6577"></div><span class="bv">$22.3K <span class="rpr">$0.045/recip</span></span></div></div>
+        <div class="bar-row"><span class="bl">Women's · 5 sends</span><div class="btrack"><div class="bfill" style="width:10%;background:#9aa3b2"></div><span class="bv">$9.2K <span class="rpr">$0.048/recip</span></span></div></div>
+      </div>
+      <p class="body" style="font-size:20px;margin-top:30px;color:var(--muted)">Men's drove <strong style="color:var(--ink)">~74% of email campaign revenue</strong> and the highest efficiency at $0.10/recipient — roughly 2× the women's and full-list sends.</p>
+    </div>
+  </div>
+  <span class="slide-label">7Diamonds · May 2026 · 03</span>
+</section>
+
+<!-- ============ SLIDE 4 · CHANNEL COMPARISON + SMS ============ -->
+<section class="slide" id="slide-04-channels">
+  <div class="sec-head"><h2>Email vs SMS</h2><span class="tag">Engagement &amp; efficiency by channel</span></div>
+  <div class="row" style="flex:1">
+    <div class="card grow">
+      <h3 style="margin-bottom:18px">Channel comparison</h3>
+      <table>
+        <thead><tr><th>Metric</th><th>Email</th><th>SMS</th></tr></thead>
+        <tbody>
+          <tr><td class="name">Recipients</td><td>1,635,735</td><td>95,176</td></tr>
+          <tr><td class="name">Delivery rate</td><td>99.6%</td><td>99.97%</td></tr>
+          <tr><td class="name">Open rate</td><td>51.7%</td><td>—</td></tr>
+          <tr><td class="name">Click rate</td><td>0.33%</td><td>0.98%</td></tr>
+          <tr><td class="name">Conversions</td><td>523</td><td>83</td></tr>
+          <tr><td class="name">Unsub rate</td><td>0.10%</td><td>0.27%</td></tr>
+          <tr><td class="name">Revenue / recipient</td><td>$0.077</td><td class="pos">$0.234</td></tr>
+          <tr><td class="name">Total revenue</td><td>$125,685</td><td>$22,261</td></tr>
+        </tbody>
+      </table>
+      <p class="body" style="font-size:20px;margin-top:24px;color:var(--muted)">SMS earned <strong style="color:var(--ink)">3× more revenue per recipient</strong> and a higher click rate, but a higher unsubscribe rate — use it selectively for the highest-intent moments.</p>
+    </div>
+    <div class="card grow">
+      <h3 style="margin-bottom:18px">SMS campaigns — full month</h3>
+      <table>
+        <thead><tr><th>Campaign</th><th>Recipients</th><th>Click</th><th>Conv.</th><th>Revenue</th></tr></thead>
+        <tbody>
+          <tr><td class="name">SMS FULL Mothers Day 02</td><td>18,082</td><td>0.87%</td><td>15</td><td>$5,091</td></tr>
+          <tr><td class="name">SMS Men's Seersucker</td><td>17,629</td><td>1.59%</td><td>18</td><td>$4,982</td></tr>
+          <tr><td class="name">SMS Men's Denim</td><td>17,770</td><td>0.73%</td><td>17</td><td>$4,437</td></tr>
+          <tr><td class="name">SMS Men's Swim</td><td>6,226</td><td>1.61%</td><td>8</td><td>$2,847</td></tr>
+          <tr><td class="name">SMS Men's Pants</td><td>17,721</td><td>0.70%</td><td>14</td><td>$2,829</td></tr>
+          <tr><td class="name">SMS Men's Pullovers</td><td>17,748</td><td>0.82%</td><td>11</td><td>$2,075</td></tr>
+        </tbody>
+      </table>
+      <p class="body" style="font-size:20px;margin-top:24px;color:var(--muted)">All SMS sent to the "SMS Subscribers" segment, excluding SMS errors and recent purchasers; the May 25 swim send also suppressed unengaged SMS.</p>
+    </div>
+  </div>
+  <span class="slide-label">7Diamonds · May 2026 · 04</span>
+</section>
+
+<!-- ============ SLIDE 5 · TOP EMAIL CAMPAIGNS ============ -->
+<section class="slide" id="slide-05-top-campaigns">
+  <div class="sec-head"><h2>Top 10 email campaigns by revenue</h2><span class="tag">Men's category drops led the month</span></div>
+  <div class="card grow">
+    <table class="compact" style="font-size:20px">
+      <thead><tr><th>Campaign</th><th>Sent</th><th>Recipients</th><th>Open</th><th>Click</th><th>Conv.</th><th>Unsubs</th><th>Revenue</th></tr></thead>
+      <tbody>
+        <tr><td class="name">MENS – Short Sleeve Shirts<div class="subj">“Clean Classic Shirts”</div></td><td>May 20</td><td>61,082</td><td>55.7%</td><td>0.50%</td><td>40</td><td class="u">88</td><td><strong>$11,060</strong></td></tr>
+        <tr><td class="name">MENS – SWIM EDIT 02<div class="subj">“Pool Day, Solved”</div></td><td>May 25</td><td>57,323</td><td>56.3%</td><td>0.40%</td><td>37</td><td class="u">73</td><td><strong>$9,799</strong></td></tr>
+        <tr><td class="name">MENS – Generation Pants<div class="subj">“The Pant Series 03: Generation™ 5-Pocket”</div></td><td>May 17</td><td>60,285</td><td>56.4%</td><td>0.39%</td><td>34</td><td class="u">81</td><td><strong>$8,438</strong></td></tr>
+        <tr><td class="name">MENS – SWIM<div class="subj">“Swim Trunks that Go Places”</div></td><td>May 24</td><td>83,665</td><td>47.2%</td><td>0.44%</td><td>27</td><td class="u">78</td><td><strong>$7,090</strong></td></tr>
+        <tr><td class="name">MENS – Polos<div class="subj">“The Polo, Refined”</div></td><td>May 14</td><td>59,038</td><td>56.4%</td><td>0.40%</td><td>29</td><td class="u">61</td><td><strong>$6,519</strong></td></tr>
+        <tr><td class="name">MENS – Coastal Cotton<div class="subj">“Lightweight Short Sleeve Shirts”</div></td><td>May 28</td><td>57,302</td><td>59.0%</td><td>0.60%</td><td>26</td><td class="u">60</td><td><strong>$6,265</strong></td></tr>
+        <tr><td class="name">MENS – Best Sellers<div class="subj">“Most Worn”</div></td><td>May 4</td><td>82,242</td><td>47.1%</td><td>0.41%</td><td>28</td><td class="u">93</td><td><strong>$6,194</strong></td></tr>
+        <tr><td class="name">MENS – Zuma Pants<div class="subj">“The Pant Series 02: Zuma Chino”</div></td><td>May 16</td><td>60,472</td><td>56.7%</td><td>0.46%</td><td>22</td><td class="u">62</td><td><strong>$5,870</strong></td></tr>
+        <tr><td class="name">MENS – 5-Pocket Pant<div class="subj">“Your New Go-To Pant”</div></td><td>May 12</td><td>77,745</td><td>49.8%</td><td>0.47%</td><td>28</td><td class="u">86</td><td><strong>$5,364</strong></td></tr>
+        <tr><td class="name">MENS – Infinity Pants<div class="subj">“The Pant Series 01: Infinity™ 7-Pocket”</div></td><td>May 15</td><td>59,415</td><td>57.4%</td><td>0.42%</td><td>16</td><td class="u">49</td><td><strong>$5,317</strong></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <span class="slide-label">7Diamonds · May 2026 · 05</span>
+</section>
+
+<!-- ============ SLIDE 6 · CAMPAIGN TAKEAWAYS ============ -->
+<section class="slide" id="slide-06-campaign-takeaways">
+  <div class="sec-head"><h2>Takeaways — Campaigns</h2><span class="tag">What worked &amp; what to adjust</span></div>
+  <div class="row" style="flex:1">
+    <div class="takeaway grow">
+      <h4>Headlines</h4>
+      <ul>
+        <li><strong>Men's drives the business.</strong> 15 men's email sends produced ~$92.6K (74% of email campaign revenue). Continue the category-drop cadence and protect this engine.</li>
+        <li><strong>Best individual performers</strong> were men's bottoms and swim: Short Sleeve Shirts ($11.1K), Swim Edit 02 ($9.8K) and Generation Pants ($8.4K) led the month.</li>
+        <li><strong>SMS punches above its weight.</strong> $0.23 revenue/recipient vs $0.08 for email — reserve SMS for marquee launches and time-sensitive offers.</li>
+        <li><strong>Mother's Day full-list sends</strong> delivered reach and strong opens (46–47%) but low click/conversion — broad "edit" emails work better as awareness than direct-response.</li>
+        <li><strong>Women's &amp; wholesale are under-leveraged</strong> (combined ~$10.8K). Test more frequent women's category drops to the engaged female segment.</li>
+        <li><strong>Low performers lagged on product &amp; audience, not timing.</strong> Pullovers opened at 58% but barely converted — a warm layer in late-May heat while swim, shorts and pants were winning.</li>
+      </ul>
+    </div>
+    <div class="takeaway grow">
+      <h4>Patterns across all 40 sends</h4>
+      <ul>
+        <li><strong>Tighter segments open ~10 points higher.</strong> Affinity / 180-day-engaged sends opened 56–63% vs 46–49% for full-list — segmentation is the biggest engagement lever.</li>
+        <li><strong>Heavy cadence, healthy list.</strong> ~34 email + 6 SMS sends, yet unsubscribes held at ~0.10% and delivery at 99.6% — the disciplined exclusions protected the base.</li>
+        <li><strong>Pant/denim affinity did the heavy lifting — and took the most sends.</strong> Six drops in May; performance held, but watch this segment first for fatigue.</li>
+        <li><strong>Resends work as a second touch.</strong> The Seersucker resend added ~$4.7K; the Shorts AM→PM split recovered extra orders. Vary the subject on the second touch — easy win.</li>
+        <li><strong>Weekends are fair game for this list.</strong> Saturday (Zuma) and the two Sunday-noon sends performed in line with weekday drops — no weekend penalty, so the calendar can flex around demand.</li>
+      </ul>
+    </div>
+  </div>
+  <span class="slide-label">7Diamonds · May 2026 · 06</span>
+</section>
+
+<!-- ============ SLIDE 7 · FLOWS ============ -->
+<section class="slide" id="slide-07-flows">
+  <div class="sec-head"><h2>Flows</h2><span class="tag">Always-on automated revenue</span></div>
+  <div class="kpis">
+    <div class="card kpi"><p class="label">Flow revenue</p><p class="val">$189.7K</p><p class="meta">56% of total attributed</p></div>
+    <div class="card kpi"><p class="label">Recipients</p><p class="val">38.2K</p><p class="meta">vs 1.73M campaign</p></div>
+    <div class="card kpi"><p class="label">Conversions</p><p class="val">768</p><p class="meta">More than all campaigns combined</p></div>
+    <div class="card kpi"><p class="label">Revenue / recipient</p><p class="val pos">$4.97</p><p class="meta">65× campaign efficiency</p></div>
+  </div>
+  <div class="row" style="margin-top:34px;flex:1">
+    <div class="card grow" style="flex:1.25">
+      <h3 style="margin-bottom:26px">Top flows by revenue</h3>
+      <div class="bars">
+        <div class="bar-row"><span class="bl">Welcome SMS</span><div class="btrack"><div class="bfill" style="width:100%;background:#2f3645"></div><span class="bv">$62.8K <span class="rpr">$45.14/recip</span></span></div></div>
+        <div class="bar-row"><span class="bl">Welcome Series Email</span><div class="btrack"><div class="bfill" style="width:63%;background:#454e5e"></div><span class="bv">$39.4K</span></div></div>
+        <div class="bar-row"><span class="bl">Abandoned Add To Cart</span><div class="btrack"><div class="bfill" style="width:37%;background:#5b6577"></div><span class="bv">$23.4K</span></div></div>
+        <div class="bar-row"><span class="bl">Abandoned Browse</span><div class="btrack"><div class="bfill" style="width:21%;background:#727d8e"></div><span class="bv">$13.3K</span></div></div>
+        <div class="bar-row"><span class="bl">Abandoned Checkout</span><div class="btrack"><div class="bfill" style="width:17%;background:#9aa3b2"></div><span class="bv">$11.0K</span></div></div>
+        <div class="bar-row"><span class="bl">Loyalty Welcome</span><div class="btrack"><div class="bfill" style="width:15%;background:#bcc3cd"></div><span class="bv">$9.5K</span></div></div>
+        <div class="bar-row"><span class="bl">Cross Sell</span><div class="btrack"><div class="bfill" style="width:13%;background:#cdd2da"></div><span class="bv">$7.9K</span></div></div>
+        <div class="bar-row"><span class="bl">Browse [Server Side]</span><div class="btrack"><div class="bfill" style="width:12%;background:#dfe3e8"></div><span class="bv">$7.2K</span></div></div>
+      </div>
+    </div>
+    <div class="takeaway grow">
+      <h4>Takeaways — Flows</h4>
+      <ul>
+        <li><strong>Welcome flows are the crown jewel.</strong> Welcome SMS ($62.8K) + Welcome Email ($39.4K) drove $102K — over half of flow revenue. Keep new-subscriber capture funded and well-supplied with offers.</li>
+        <li><strong>Abandonment recovery is healthy.</strong> Add-to-Cart, Browse and Checkout combined for ~$48K; Add to Cart's $411 AOV is the highest in the account.</li>
+        <li><strong>Loyalty flows are emerging winners.</strong> Loyalty Welcome ($9.5K) and Points Earned ($5.6K) convert well — expand loyalty-triggered automation.</li>
+        <li><strong>Zero-revenue flows to review:</strong> Loyalty Points Reminder and Wishlist drove engagement but $0 attributed revenue — revisit offer, timing, or product links.</li>
+        <li><strong>Highest-unsub flows:</strong> Cross Sell (48) and Welcome Series (175) — monitor frequency and content to protect the list.</li>
+      </ul>
+    </div>
+  </div>
+  <span class="slide-label">7Diamonds · May 2026 · 07</span>
+</section>
+
+<!-- ============ SLIDE 8 · SUBSCRIBERS ============ -->
+<section class="slide" id="slide-08-subscribers">
+  <div class="sec-head"><h2>Subscribers</h2><span class="tag">List growth — email &amp; SMS</span></div>
+  <div class="kpis">
+    <div class="card kpi"><p class="label">Email — net growth</p><p class="val pos">+1,212</p><p class="meta">3,374 subs · 2,162 unsubs · 1.56:1 ratio</p></div>
+    <div class="card kpi"><p class="label">SMS — net growth</p><p class="val pos">+187</p><p class="meta">771 subs · 584 unsubs · 1.32:1 ratio</p></div>
+    <div class="card kpi"><p class="label">Combined net</p><p class="val pos">+1,399</p><p class="meta">New marketable profiles in May</p></div>
+  </div>
+  <div class="row" style="margin-top:34px;flex:1">
+    <div class="card grow" style="flex:1.2">
+      <h3 style="margin-bottom:4px">Weekly email subs vs unsubs</h3>
+      <p style="font-size:17px;color:var(--faint);margin-bottom:10px">Week of Apr 27 is partial · US/Pacific</p>
+      <div class="vchart">
+        <div class="vgroup"><div class="vbars"><div class="vbar subs" style="height:18%"></div><div class="vbar unsubs" style="height:15%"></div></div><div class="vnum">253 / 208</div><div class="vlabel">Apr 27*</div></div>
+        <div class="vgroup"><div class="vbars"><div class="vbar subs" style="height:100%"></div><div class="vbar unsubs" style="height:37%"></div></div><div class="vnum">1,380 / 506</div><div class="vlabel">May 4</div></div>
+        <div class="vgroup"><div class="vbars"><div class="vbar subs" style="height:47%"></div><div class="vbar unsubs" style="height:46%"></div></div><div class="vnum">647 / 634</div><div class="vlabel">May 11</div></div>
+        <div class="vgroup"><div class="vbars"><div class="vbar subs" style="height:42%"></div><div class="vbar unsubs" style="height:30%"></div></div><div class="vnum">573 / 416</div><div class="vlabel">May 18</div></div>
+        <div class="vgroup"><div class="vbars"><div class="vbar subs" style="height:39%"></div><div class="vbar unsubs" style="height:29%"></div></div><div class="vnum">541 / 403</div><div class="vlabel">May 25</div></div>
+      </div>
+      <p class="legend" style="margin-top:18px"><span><span class="sw" style="background:var(--email)"></span>Subscribed</span>
+        <span><span class="sw" style="background:#c9a3a3"></span>Unsubscribed</span>
+        <span style="color:var(--faint)">SMS weekly subs: 69 → 129 → 227 → 185 → 172</span></p>
+    </div>
+    <div class="takeaway grow">
+      <h4>Takeaways — Subscribers</h4>
+      <ul>
+        <li><strong>Acquisition is outpacing churn on both channels</strong> — the foundation of compounding owned-audience revenue.</li>
+        <li><strong>Email churn concentrates in flows &amp; high-frequency sends.</strong> Welcome Series (175 unsubs) and broad full-list sends carry most opt-outs; tighter segmentation preserves growth.</li>
+        <li><strong>SMS unsubs climbed in weeks 4–5</strong> alongside heavier texting. Cap SMS frequency and keep suppressing recent purchasers / unengaged.</li>
+        <li><strong>Capitalize on the Mother's Day spike</strong> — the early-May cohort (1,380 email subs in one week) should be flowing through the Welcome series; that handoff feeds the account's biggest earner.</li>
+      </ul>
+    </div>
+  </div>
+  <span class="slide-label">7Diamonds · May 2026 · 08</span>
+</section>
+
+<!-- ============ SLIDE 9 · ENROLLMENT FORMS ============ -->
+<section class="slide" id="slide-09-enrollment-forms">
+  <div class="sec-head"><h2>Enrollment Forms</h2><span class="tag">Sign-up form performance — the brand's primary acquisition engine</span></div>
+  <div class="kpis">
+    <div class="card kpi"><p class="label">Form impressions</p><p class="val">114.2K</p><p class="meta"><span class="pos">▲ +133.8% YoY</span> · +25.5% MoM</p></div>
+    <div class="card kpi"><p class="label">Sign-ups (submissions)</p><p class="val">3,193</p><p class="meta"><span class="pos">▲ +94.9% YoY</span> · ≈ 95% of new email subs</p></div>
+    <div class="card kpi"><p class="label">Submission rate</p><p class="val" style="color:#a9762f">2.79%</p><p class="meta">▼ from 3.69% in Apr · below ~6% target</p></div>
+  </div>
+  <div class="row" style="margin-top:34px;flex:1">
+    <div class="card grow" style="flex:1.35">
+      <h3 style="margin-bottom:14px">Performance by form</h3>
+      <table class="compact forms" style="font-size:17px;white-space:nowrap">
+        <thead><tr><th>Form</th><th>Type</th><th>Impressions</th><th>Sign-ups</th><th>Submit rate</th></tr></thead>
+        <tbody>
+          <tr><td class="name">V2 Mobile (A/B test)</td><td>Pop-up</td><td>73,928</td><td>1,266</td><td>1.71%</td></tr>
+          <tr><td class="name">V2 Mobile (SMS opt-in)</td><td>SMS step</td><td>4,948</td><td>992</td><td class="pos">20.05%</td></tr>
+          <tr><td class="name">V2 Mobile on-exit</td><td>Exit-intent</td><td>16,078</td><td>360</td><td>2.24%</td></tr>
+          <tr><td class="name">V1 Desktop</td><td>Pop-up</td><td>12,641</td><td>325</td><td>2.57%</td></tr>
+          <tr><td class="name">V1 Desktop (SMS)</td><td>SMS step</td><td>1,395</td><td>117</td><td class="pos">8.39%</td></tr>
+          <tr><td class="name">V1 Desktop on-exit</td><td>Exit-intent</td><td>5,223</td><td>115</td><td>2.20%</td></tr>
+        </tbody>
+      </table>
+      <p class="body" style="font-size:17px;margin-top:14px;color:var(--muted)">Sign-ups are growing on <strong style="color:var(--ink)">volume, not efficiency</strong> — impressions +134% YoY while the submit rate slipped to 2.79% (Apr 3.69%). Form conversion is the clearest lever for list growth.</p>
+    </div>
+    <div style="flex:none;display:flex;flex-direction:column;align-items:center;gap:10px">
+      <div class="su-phone"><div class="su-screen">
+        <div class="su-bar"><span class="snotch"></span></div>
+        <div class="su-hero"><span class="su-x">✕</span></div>
+        <div class="su-modal">
+          <div class="su-logo">7 D I A M O N D S</div>
+          <p class="su-h">10% OFF YOUR<br>FIRST PURCHASE</p>
+          <p class="su-sub">Sign up for our newsletter for new arrivals and exclusive content.</p>
+          <p class="su-pref">Product Preference</p>
+          <div class="su-radios"><span><i></i> Men's</span><span><i></i> Women's</span><span><i></i> All</span></div>
+          <div class="su-input">Email</div>
+          <div class="su-btn">SUBMIT</div>
+          <div class="su-skip">NO THANK YOU</div>
+        </div>
+      </div></div>
+      <p style="font-size:15px;color:var(--faint)">Mobile sign-up form</p>
+    </div>
+    <div class="takeaway grow">
+      <h4>Takeaways — Enrollment Forms</h4>
+      <ul>
+        <li><strong>Forms drive the list.</strong> ~95% of May's new email subscribers came through sign-up forms — the top of the funnel worth protecting and optimizing.</li>
+        <li><strong>The main mobile pop-up sets the blended rate.</strong> 73.9K impressions at a 1.7% submit rate drags the overall 2.79% down — the single biggest place a conversion lift would compound.</li>
+        <li><strong>The SMS opt-in step is the efficiency standout.</strong> ~20% on mobile, ~8% on desktop — study what works (offer, fewer fields, intent) and port it to the main pop-up.</li>
+        <li><strong>Conversion is the gap.</strong> With reach up +134% YoY, even a small rate lift compounds — test the offer, timing/trigger, fields and mobile UX.</li>
+      </ul>
+    </div>
+  </div>
+  <span class="slide-label">7Diamonds · May 2026 · 09</span>
+</section>
+
+<!-- ============ SLIDE 10 · BEST CREATIVE ============ -->
+<section class="slide" id="slide-10-best-creative">
+  <div class="sec-head"><h2>Creative Report</h2><span class="tag">🏆 Best creative of the month</span></div>
+  <div class="row" style="flex:1">
+    <div style="width:540px;flex:none;display:flex;flex-direction:column;gap:16px;min-height:0">
+      <div class="card" style="padding:0;overflow:hidden;flex:none;height:676px">
+        <img src="https://d3k81ch9hvuctc.cloudfront.net/company/TSt5zk/images/7d2bcb6c-a509-422c-aae7-47203d17daad.jpeg" alt="MENS Short Sleeve Shirts hero" style="width:100%;height:100%;object-fit:cover;object-position:top center;display:block">
+      </div>
+      <p style="font-size:20px;color:var(--muted);text-align:center"><strong style="color:var(--ink)">MENS – Short Sleeve Shirts</strong> · $11,060 · $0.18/recipient · 40 orders</p>
+    </div>
+    <div class="col grow" style="gap:18px">
+      <div class="takeaway gold">
+        <h4>Why this won best creative</h4>
+        <ul>
+          <li style="font-size:19px"><strong>A specific, benefit-clear subject.</strong> "Clean Classic Shirts" sets a plain, confident expectation — paired with a preview ("New men's short sleeves, in now.") that confirms the offer.</li>
+          <li style="font-size:19px"><strong>Shoppable from the first scroll.</strong> It opens on a clean single-product hero, not a lifestyle or text banner — the product is the message.</li>
+          <li style="font-size:19px"><strong>Right product, right segment, right time.</strong> An in-season staple sent to the engaged men's base — the month's best efficiency at $0.18/recipient and top revenue overall.</li>
+        </ul>
+      </div>
+      <p class="body" style="font-size:19px"><strong>Overall, May was a strong, disciplined creative month.</strong> Consistent brand look — single-product heroes on white, steady logo lockup, tidy preview text. Performance separated on <em>audience and specificity</em>, not design quality: product-named men's drops won; broad Mother's Day sends drove opens but converted less efficiently. Opens are inflated by Apple Mail Privacy — the real gap is click-through.</p>
+      <div class="takeaway green">
+        <h4>★ Main takeaway for the team</h4>
+        <ul><li style="padding-left:0;font-size:19px"><span style="position:static">The creative is doing its job — <strong>the next gain isn't prettier emails, it's sharper specificity.</strong> Name the product in the subject, lead on a shoppable hero, put the offer in the subject line, and carry the men's "name it, show it" discipline into the women's and full-list sends. Then chase the click, not the open.</span></li></ul>
+      </div>
+    </div>
+  </div>
+  <span class="slide-label">7Diamonds · May 2026 · 10</span>
+</section>
+
+<!-- ============ SLIDE 11 · MEN'S CREATIVE ============ -->
+<section class="slide" id="slide-11-creative-mens">
+  <div class="sec-head"><h2>Creative — Men's</h2><span class="tag">Top performers by attributed revenue · creative loads live from Klaviyo CDN</span></div>
+  <div class="cr-grid" style="flex:1">
+    <div class="cr-card">
+      <div class="cr-rankbar"><span class="cr-rank">#1</span><span class="cr-rev">$11,060</span></div>
+      <div class="cr-thumb"><img src="https://d3k81ch9hvuctc.cloudfront.net/company/TSt5zk/images/7d2bcb6c-a509-422c-aae7-47203d17daad.jpeg" alt="Short Sleeve Shirts"></div>
+      <div class="cr-body">
+        <p class="cr-name">MENS – Short Sleeve Shirts</p>
+        <p class="cr-subj"><span class="lbl">Subject</span>Clean Classic Shirts</p>
+        <p class="cr-read"><span class="ok">✓</span> Specific, benefit-clear subject + clean single-product hero — the month's most efficient send at $0.18/recipient.</p>
+        <div class="cr-metrics"><div class="cr-metric"><div class="m-val">61K</div><div class="m-lbl">Sent</div></div><div class="cr-metric"><div class="m-val">55.7%</div><div class="m-lbl">Open</div></div><div class="cr-metric"><div class="m-val">0.50%</div><div class="m-lbl">CTR</div></div><div class="cr-metric"><div class="m-val">40</div><div class="m-lbl">Orders</div></div></div>
+      </div>
+    </div>
+    <div class="cr-card">
+      <div class="cr-rankbar"><span class="cr-rank">#2</span><span class="cr-rev">$9,799</span></div>
+      <div class="cr-thumb"><img src="https://d3k81ch9hvuctc.cloudfront.net/company/TSt5zk/images/6d960982-0a85-44d7-87b4-921b5a2ad8b8.jpeg" alt="Swim Edit 02"></div>
+      <div class="cr-body">
+        <p class="cr-name">MENS – SWIM EDIT 02</p>
+        <p class="cr-subj"><span class="lbl">Subject</span>Pool Day, Solved</p>
+        <p class="cr-read"><span class="ok">✓</span> Playful, benefit-led subject and a perfectly in-season swim hero — $0.17/recipient on a tight 57K segment.</p>
+        <div class="cr-metrics"><div class="cr-metric"><div class="m-val">57K</div><div class="m-lbl">Sent</div></div><div class="cr-metric"><div class="m-val">56.3%</div><div class="m-lbl">Open</div></div><div class="cr-metric"><div class="m-val">0.40%</div><div class="m-lbl">CTR</div></div><div class="cr-metric"><div class="m-val">37</div><div class="m-lbl">Orders</div></div></div>
+      </div>
+    </div>
+    <div class="cr-card">
+      <div class="cr-rankbar"><span class="cr-rank">#3</span><span class="cr-rev">$8,438</span></div>
+      <div class="cr-thumb"><img src="https://d3k81ch9hvuctc.cloudfront.net/company/TSt5zk/images/95367cc9-8b7b-414b-bfaa-a6394c634ef5.jpeg" alt="Generation Pants"></div>
+      <div class="cr-body">
+        <p class="cr-name">MENS – Generation Pants</p>
+        <p class="cr-subj"><span class="lbl">Subject</span>The Pant Series 03: Generation™</p>
+        <p class="cr-read"><span class="ok">✓</span> Franchise naming signals a known, trusted product — strong open and conversion from the pant-affinity base.</p>
+        <div class="cr-metrics"><div class="cr-metric"><div class="m-val">60K</div><div class="m-lbl">Sent</div></div><div class="cr-metric"><div class="m-val">56.4%</div><div class="m-lbl">Open</div></div><div class="cr-metric"><div class="m-val">0.39%</div><div class="m-lbl">CTR</div></div><div class="cr-metric"><div class="m-val">34</div><div class="m-lbl">Orders</div></div></div>
+      </div>
+    </div>
+    <div class="cr-card">
+      <div class="cr-rankbar"><span class="cr-rank">#4</span><span class="cr-rev">$7,090</span></div>
+      <div class="cr-thumb"><img src="https://d3k81ch9hvuctc.cloudfront.net/company/TSt5zk/images/f17283af-2501-4bcf-8ee2-c264f1c1bdb4.jpeg" alt="Swim"></div>
+      <div class="cr-body">
+        <p class="cr-name">MENS – SWIM</p>
+        <p class="cr-subj"><span class="lbl">Subject</span>Swim Trunks that Go Places</p>
+        <p class="cr-read"><span class="ok">✓</span> Widest reach of the swim sends (84K) on an in-season product — most total orders of the swim group.</p>
+        <div class="cr-metrics"><div class="cr-metric"><div class="m-val">84K</div><div class="m-lbl">Sent</div></div><div class="cr-metric"><div class="m-val">47.2%</div><div class="m-lbl">Open</div></div><div class="cr-metric"><div class="m-val">0.44%</div><div class="m-lbl">CTR</div></div><div class="cr-metric"><div class="m-val">27</div><div class="m-lbl">Orders</div></div></div>
+      </div>
+    </div>
+    <div class="cr-card lose">
+      <div class="cr-rankbar"><span class="cr-rank">Lowest</span><span class="cr-rev lose">$2,903</span></div>
+      <div class="cr-thumb"><img src="https://d3k81ch9hvuctc.cloudfront.net/company/TSt5zk/images/65cee913-d3e3-4224-bdde-a2c632d0dcbe.jpeg" alt="Pullovers"></div>
+      <div class="cr-body">
+        <p class="cr-name">MENS – Pullovers</p>
+        <p class="cr-subj"><span class="lbl">Subject</span>Well-Rounded Pullovers</p>
+        <p class="cr-read"><span class="ok" style="color:#a9762f">⤳</span> Warm-layer product in a warm month: 58% open didn't convert. Save pullovers for cooler months; lead with in-season categories.</p>
+        <div class="cr-metrics"><div class="cr-metric"><div class="m-val">58K</div><div class="m-lbl">Sent</div></div><div class="cr-metric"><div class="m-val">57.9%</div><div class="m-lbl">Open</div></div><div class="cr-metric"><div class="m-val">0.38%</div><div class="m-lbl">CTR</div></div><div class="cr-metric"><div class="m-val">16</div><div class="m-lbl">Orders</div></div></div>
+      </div>
+    </div>
+  </div>
+  <span class="slide-label">7Diamonds · May 2026 · 11</span>
+</section>
+
+<!-- ============ SLIDE 12 · WOMEN'S + FULL-LIST CREATIVE ============ -->
+<section class="slide" id="slide-12-creative-womens-mixed">
+  <div class="sec-head"><h2>Creative — Women's &amp; Full-list</h2><span class="tag">Top performers by audience</span></div>
+  <div class="cr-grid" style="flex:1">
+    <div class="cr-card">
+      <div class="cr-rankbar"><span class="cr-rank">Women's #1</span><span class="cr-rev">$2,457</span></div>
+      <div class="cr-thumb"><img src="https://d3k81ch9hvuctc.cloudfront.net/company/TSt5zk/images/a5aad743-6c5e-41c5-99dd-73c12287876f.jpeg" alt="Women's Pants"></div>
+      <div class="cr-body">
+        <p class="cr-name">WOMEN'S – Pants</p>
+        <p class="cr-subj"><span class="lbl">Subject</span>New Rotation: Tailored Ease</p>
+        <p class="cr-read"><span class="ok">✓</span> Benefit-led subject + clean tailored-product hero made it the top women's send. The small engaged-female base caps upside — growing the segment is the lever.</p>
+        <div class="cr-metrics"><div class="cr-metric"><div class="m-val">39K</div><div class="m-lbl">Sent</div></div><div class="cr-metric"><div class="m-val">58.5%</div><div class="m-lbl">Open</div></div><div class="cr-metric"><div class="m-val">12</div><div class="m-lbl">Orders</div></div></div>
+      </div>
+    </div>
+    <div class="cr-card">
+      <div class="cr-rankbar"><span class="cr-rank">Women's #2</span><span class="cr-rev">$2,234</span></div>
+      <div class="cr-thumb"><img src="https://d3k81ch9hvuctc.cloudfront.net/company/TSt5zk/images/e248e6c8-91b5-4b5b-aa42-c126cbd7f0fb.gif" alt="Not Just for Mondays"></div>
+      <div class="cr-body">
+        <p class="cr-name">WOMEN'S – Not Just for Mondays</p>
+        <p class="cr-subj"><span class="lbl">Subject</span>Not Just For Mondays</p>
+        <p class="cr-read"><span class="ok">✓</span> Animated best-sellers hero (GIF) + punchy subject earned a high 57% open. "Best sellers, all week" is generic — name the hero product to convert more opens.</p>
+        <div class="cr-metrics"><div class="cr-metric"><div class="m-val">39K</div><div class="m-lbl">Sent</div></div><div class="cr-metric"><div class="m-val">57.1%</div><div class="m-lbl">Open</div></div><div class="cr-metric"><div class="m-val">10</div><div class="m-lbl">Orders</div></div></div>
+      </div>
+    </div>
+    <div class="cr-card">
+      <div class="cr-rankbar"><span class="cr-rank">Full-list #1</span><span class="cr-rev">$4,752</span></div>
+      <div class="cr-thumb"><img src="https://d3k81ch9hvuctc.cloudfront.net/company/TSt5zk/images/62fa36ba-a8b1-4d19-969e-593f43374a8b.jpeg" alt="Mother's Day Edit 04"></div>
+      <div class="cr-body">
+        <p class="cr-name">FULL – Mother's Day Edit 04</p>
+        <p class="cr-subj"><span class="lbl">Subject</span>Last Call for Mom</p>
+        <p class="cr-read"><span class="ok">✓</span> Urgency + incentive (overnight shipping / free tote) made it the top full-list send of the holiday push.</p>
+        <div class="cr-metrics"><div class="cr-metric"><div class="m-val">83K</div><div class="m-lbl">Sent</div></div><div class="cr-metric"><div class="m-val">45.8%</div><div class="m-lbl">Open</div></div><div class="cr-metric"><div class="m-val">22</div><div class="m-lbl">Orders</div></div></div>
+      </div>
+    </div>
+    <div class="cr-card">
+      <div class="cr-rankbar"><span class="cr-rank">Mixed #2</span><span class="cr-rev">$4,401</span></div>
+      <div class="cr-thumb"><img src="https://d3k81ch9hvuctc.cloudfront.net/company/TSt5zk/images/db111072-7f9b-4d66-93cd-3db30aa57cf8.jpeg" alt="Getaway Edit"></div>
+      <div class="cr-body">
+        <p class="cr-name">MIXED – Getaway Edit</p>
+        <p class="cr-subj"><span class="lbl">Subject</span>The Collection That Keeps It Light</p>
+        <p class="cr-read"><span class="ok">✓</span> A clear seasonal theme (seersucker) gave the broad send a reason to open. A named hero item would sharpen direct response.</p>
+        <div class="cr-metrics"><div class="cr-metric"><div class="m-val">83K</div><div class="m-lbl">Sent</div></div><div class="cr-metric"><div class="m-val">46.2%</div><div class="m-lbl">Open</div></div><div class="cr-metric"><div class="m-val">19</div><div class="m-lbl">Orders</div></div></div>
+      </div>
+    </div>
+    <div class="cr-card lose">
+      <div class="cr-rankbar"><span class="cr-rank">Lowest full-list</span><span class="cr-rev lose">$3,337</span></div>
+      <div class="cr-thumb"><img src="https://d3k81ch9hvuctc.cloudfront.net/company/TSt5zk/images/beaad1fe-9515-4493-9a06-5ea7b83bb4d3.jpeg" alt="Mother's Day 05"></div>
+      <div class="cr-body">
+        <p class="cr-name">FULL – Mother's Day 05</p>
+        <p class="cr-subj"><span class="lbl">Subject</span>Happy Mother's Day</p>
+        <p class="cr-read"><span class="ok" style="color:#a9762f">⤳</span> Highest open of the edits (47.4%) but a text-only hero leads with a message, not product — open on a shoppable image instead.</p>
+        <div class="cr-metrics"><div class="cr-metric"><div class="m-val">83K</div><div class="m-lbl">Sent</div></div><div class="cr-metric"><div class="m-val">47.4%</div><div class="m-lbl">Open</div></div><div class="cr-metric"><div class="m-val">16</div><div class="m-lbl">Orders</div></div></div>
+      </div>
+    </div>
+  </div>
+  <span class="slide-label">7Diamonds · May 2026 · 12</span>
+</section>
+
+<!-- ============ SLIDE 13 · SMS CREATIVE ============ -->
+<section class="slide" id="slide-13-creative-sms">
+  <div class="sec-head"><h2>Creative — SMS</h2><span class="tag">~$0.23 revenue per recipient · roughly 3× email</span></div>
+  <div class="row" style="flex:1">
+    <div style="width:340px;flex:none" class="col">
+      <p style="font-size:19px;font-weight:650;text-align:center">$5,091 · Top SMS<br><span style="font-weight:400;color:var(--muted);font-size:17px">FULL – Mothers Day</span></p>
+      <div class="phone"><p class="from">7Diamonds</p><div class="bubble">Don't forget Mom. Free express shipping + tote on $300+
+
+Code: FORMOM26
+
+<span class="lnk">7diamonds.com/collections/mothers-day</span></div></div>
+    </div>
+    <div style="width:340px;flex:none" class="col">
+      <p style="font-size:19px;font-weight:650;text-align:center">$4,982 · Best CTR (1.59%)<br><span style="font-weight:400;color:var(--muted);font-size:17px">MENS – Seersucker</span></p>
+      <div class="phone"><p class="from">7Diamonds</p><div class="bubble"><img src="https://d3k81ch9hvuctc.cloudfront.net/company/TSt5zk/images/7ca6f7b3-fadc-4510-bf68-720f2b924a38.jpeg" alt="Seersucker">Your warm-weather rotation starts here. Explore seersucker stretch styles from polos and camp shirts to shorts, pants, and more.
+
+<span class="lnk">7diamonds.com/collections/seersucker-stretch</span></div></div>
+    </div>
+    <div style="width:340px;flex:none" class="col">
+      <p style="font-size:19px;font-weight:650;text-align:center">$2,847 · Best $/recip ($0.46)<br><span style="font-weight:400;color:var(--muted);font-size:17px">MENS – Swim</span></p>
+      <div class="phone"><p class="from">7Diamonds</p><div class="bubble"><img src="https://d3k81ch9hvuctc.cloudfront.net/company/TSt5zk/images/79a22be2-373e-4101-a0ff-f226fbf2fa56.jpeg" alt="Swim">Swim season starts here. Shop new trunks designed for pool days, beach weekends, and everything in between.
+<span class="lnk">7diamonds.com/collections/swim-mens</span></div></div>
+    </div>
+    <div class="takeaway grow">
+      <h4>Takeaways — SMS</h4>
+      <ul>
+        <li><strong>Offer drove the top send.</strong> "Mothers Day" led on revenue ($5.1K) with a real incentive (free shipping + tote, code FORMOM26) — and no image needed. A clear offer beats a pretty picture on SMS.</li>
+        <li><strong>Specific, in-season product won clicks.</strong> Seersucker and Swim posted the best click rates (1.6%), each pairing a named seasonal category with a clean MMS shot.</li>
+        <li><strong>Tighter targeting pays.</strong> The Swim send went to the smallest, most-filtered list (6.2K, unengaged suppressed) and returned the highest revenue per recipient at $0.46.</li>
+        <li><strong>Click-through is the gap.</strong> Rates ran 0.7–1.6% vs the ~3% benchmark — shorten copy, lead with the offer or the single best product, and keep one clear link.</li>
+      </ul>
+    </div>
+  </div>
+  <span class="slide-label">7Diamonds · May 2026 · 13</span>
+</section>
+
+<!-- ============ SLIDE 14 · RETENTION HEALTH ============ -->
+<section class="slide" id="slide-14-health">
+  <div class="sec-head"><h2>Retention Health</h2><span class="tag">May 2026 · composite scorecard vs industry benchmarks</span></div>
+  <div class="row" style="flex:1;align-items:center">
+    <div style="width:480px;flex:none;display:flex;flex-direction:column;align-items:center;gap:22px">
+      <div class="ring" style="width:330px;height:330px;background:conic-gradient(var(--pos) 0 280.8deg,var(--line) 280.8deg 360deg)">
+        <div class="inner" style="width:262px;height:262px">
+          <span class="score" style="font-size:96px">78</span>
+          <span class="of">/ 100 · Good</span>
+        </div>
+      </div>
+      <p class="body" style="font-size:21px;text-align:center;color:var(--muted)">Solid retention performance with room to optimize. Flows are exceptional; the opportunity is lifting click-through on email and SMS.</p>
+    </div>
+    <div class="col grow">
+      <div class="row">
+        <div class="card grow" style="text-align:center"><div class="ring" style="width:130px;height:130px;margin:0 auto 12px;background:conic-gradient(var(--pos) 0 324deg,var(--line) 324deg 360deg)"><div class="inner" style="width:100px;height:100px"><span class="score" style="font-size:38px">90</span></div></div><p style="font-size:21px;font-weight:650">Flows</p><p style="font-size:17px;color:var(--faint)">35% weight</p></div>
+        <div class="card grow" style="text-align:center"><div class="ring" style="width:130px;height:130px;margin:0 auto 12px;background:conic-gradient(#a9762f 0 244.8deg,var(--line) 244.8deg 360deg)"><div class="inner" style="width:100px;height:100px"><span class="score" style="font-size:38px">68</span></div></div><p style="font-size:21px;font-weight:650">Email</p><p style="font-size:17px;color:var(--faint)">30% weight</p></div>
+        <div class="card grow" style="text-align:center"><div class="ring" style="width:130px;height:130px;margin:0 auto 12px;background:conic-gradient(var(--pos) 0 280.8deg,var(--line) 280.8deg 360deg)"><div class="inner" style="width:100px;height:100px"><span class="score" style="font-size:38px">78</span></div></div><p style="font-size:21px;font-weight:650">List</p><p style="font-size:17px;color:var(--faint)">20% weight</p></div>
+        <div class="card grow" style="text-align:center"><div class="ring" style="width:130px;height:130px;margin:0 auto 12px;background:conic-gradient(#a9762f 0 252deg,var(--line) 252deg 360deg)"><div class="inner" style="width:100px;height:100px"><span class="score" style="font-size:38px">70</span></div></div><p style="font-size:21px;font-weight:650">SMS</p><p style="font-size:17px;color:var(--faint)">15% weight</p></div>
+      </div>
+      <div class="takeaway green">
+        <h4>💡 Health summary</h4>
+        <ul><li style="padding-left:0"><span style="position:static">Overall retention health scores <strong>78/100 — Good</strong>. May generated <strong>$337.7K</strong> in attributed revenue, up <strong>14% YoY</strong>, with flows contributing 56% and scoring a standout 90/100. The two areas with the most headroom are <strong>email and SMS click-through</strong> — both convert and retain well, but click rates sit below benchmark, so the next gain is stronger in-email/in-text CTAs and tighter product focus rather than more volume. List health is solid: both lists grew net-positive with unsubs at 0.10%.</span></li></ul>
+      </div>
+      <p class="foot-note">Scores are a composite of May 2026 metrics graded against industry benchmarks (weighted: Flows 35%, Email 30%, List 20%, SMS 15%). Directional, not an official Klaviyo metric. · Source: Klaviyo (account 7Diamonds, TSt5zk). Campaign &amp; flow figures use send-date attribution (Placed Order); subscriber counts use event-time aggregation. Email opens reflect Apple Mail Privacy inflation.</p>
+    </div>
+  </div>
+  <span class="slide-label">7Diamonds · May 2026 · 14</span>
+</section>
+
+</div>
+</body>
+</html>
