@@ -33,9 +33,6 @@ export interface KlaviyoPerformanceSummary {
   topByRevenue: KlaviyoCampaignPerformanceRow[]
 }
 
-/** Klaviyo caps page[size] at 10 for many collection endpoints */
-const KLAVIYO_PAGE_SIZE = 10
-
 const PLACED_ORDER_PATTERNS: { pattern: RegExp; score: number }[] = [
   { pattern: /^placed\s*order$/i, score: 100 },
   { pattern: /placed\s*order/i, score: 90 },
@@ -60,7 +57,7 @@ async function fetchAllKlaviyoMetrics(apiKey: string): Promise<{
   error: string | null
 }> {
   const all: KlaviyoMetricRow[] = []
-  let url: string | null = `${KLAVIYO_API_BASE}/metrics/?fields[metric]=name,integration&page[size]=${KLAVIYO_PAGE_SIZE}`
+  let url: string | null = `${KLAVIYO_API_BASE}/metrics/?fields[metric]=name,integration`
   let pages = 0
   const maxPages = 100
 

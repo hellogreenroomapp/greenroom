@@ -86,18 +86,32 @@
               v-for="item in itemsForDay(cell.date)"
               :key="item.id"
               type="button"
-              class="w-full text-left text-[10px] sm:text-xs leading-tight px-1.5 py-1 rounded truncate font-medium text-white hover:opacity-90 transition-opacity"
+              class="w-full text-left text-[10px] sm:text-xs leading-tight px-1.5 py-1 rounded font-medium text-white hover:opacity-90 transition-opacity min-w-0"
               :class="{ 'ring-1 ring-white/40': item.source === 'klaviyo' }"
               :style="{ backgroundColor: storyCalendarItemColor(item) }"
               :title="item.title"
               @click="onItemClick(item)"
             >
-              {{ item.displayLabel }}
+              <span class="flex items-center gap-1 min-w-0">
+                <span class="truncate flex-1 min-w-0">{{ item.displayLabel }}</span>
+                <span
+                  v-if="item.source === 'suggested' && item.beat?.products.length"
+                  class="opacity-80 font-normal shrink-0"
+                >
+                  {{ item.beat.products.length }}
+                </span>
+              </span>
               <span
-                v-if="item.source === 'suggested' && item.beat?.products.length"
-                class="opacity-80 font-normal"
+                v-if="genderTagsForItem(item).length"
+                class="flex flex-wrap gap-0.5 mt-0.5"
               >
-                · {{ item.beat.products.length }}
+                <span
+                  v-for="audience in genderTagsForItem(item)"
+                  :key="audience"
+                  class="text-[8px] sm:text-[9px] leading-none px-1 py-px rounded bg-white/25 font-semibold"
+                >
+                  {{ storyGenderLabel(audience) }}
+                </span>
               </span>
             </button>
           </div>
@@ -142,7 +156,11 @@ import { ref, computed } from 'vue'
 import MarketingStoryDetailModal from '@/components/marketing/MarketingStoryDetailModal.vue'
 import MarketingKlaviyoCampaignModal from '@/components/marketing/MarketingKlaviyoCampaignModal.vue'
 import { getMonthDays, isToday } from '@/utils/dates'
-import { storyBeatDayKey } from '@/utils/marketingStoryCalendar'
+import {
+  storyBeatDayKey,
+  storyGenderLabel,
+  storyGenderTagsForBeat,
+} from '@/utils/marketingStoryCalendar'
 import type { MarketingStoryBeat } from '@/utils/marketingStoryCalendar'
 import type { MarketingKlaviyoInsights } from '@/types/klaviyoInsights'
 import type { SavedMarketingStory } from '@/types/marketingSavedStories'
@@ -212,6 +230,10 @@ const itemsByDay = computed(() => buildBeatsByDayIndexForItems(props.items))
 
 function itemsForDay(date: Date): StoryCalendarItem[] {
   return itemsByDay.value.get(storyBeatDayKey(date)) ?? []
+}
+
+function genderTagsForItem(item: StoryCalendarItem) {
+  return storyGenderTagsForBeat(item.beat)
 }
 
 function onItemClick(item: StoryCalendarItem) {

@@ -24,6 +24,12 @@
           >
             {{ beat.categoryLabel }}
           </span>
+          <span
+            v-else-if="beat.storyKind === 'launch'"
+            class="font-semibold px-2 py-1 rounded-md bg-emerald-100 text-emerald-900"
+          >
+            {{ launchTheme }}
+          </span>
           <span v-if="isSaved" class="font-semibold px-2 py-1 rounded-md bg-indigo-100 text-indigo-900">
             Saved
           </span>
@@ -173,6 +179,13 @@ watch(
   },
   { immediate: true }
 )
+
+const launchTheme = computed(() => {
+  if (!props.beat || props.beat.storyKind !== 'launch') return ''
+  const label = props.beat.displayLabel
+  const parts = label.split(' · ')
+  return parts.length > 1 ? parts.slice(1).join(' · ') : label
+})
 
 const modalTitle = computed(() =>
   props.beat ? `Story · ${props.beat.displayLabel}` : 'Story concept'

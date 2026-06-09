@@ -10,12 +10,24 @@ const db = () => admin.firestore()
 
 interface KlaviyoCampaignAttributes {
   name?: string
-  scheduled_at?: string | null
+  /** When the campaign will be / was sent (from Klaviyo send job). */
+  send_time?: string | null
   status?: string
   audiences?: {
     included?: string[]
     excluded?: string[]
   }
+}
+
+function parseIsoDate(value: string | null | undefined): Date | null {
+  if (!value) return null
+  const parsed = new Date(value)
+  return Number.isNaN(parsed.getTime()) ? null : parsed
+}
+
+/** Calendar placement uses Klaviyo `send_time` only. */
+export function resolveCampaignSendDate(attrs: KlaviyoCampaignAttributes | undefined): Date | null {
+  return parseIsoDate(attrs?.send_time)
 }
 
 interface KlaviyoCampaignResource {
@@ -28,7 +40,7 @@ async function fetchCampaignsByChannel(
   channel: 'email' | 'sms'
 ): Promise<KlaviyoCampaignResource[]> {
   const filter = encodeURIComponent(`equals(messages.channel,'${channel}')`)
-  const url = `${KLAVIYO_API_BASE}/campaigns/?filter=${filter}&fields[campaign]=name,scheduled_at,status,audiences`
+  const url = `${KLAVIYO_API_BASE}/campaigns/?filter=${filter}&fields[campaign]=name,send_time,status,audiences`
 
   const res = await fetch(url, {
     headers: klaviyoPrivateKeyHeaders(apiKey),
@@ -97,14 +109,9 @@ export async function syncKlaviyoCampaignsForBrand(
   const campaignMeta: CampaignMeta[] = []
   let written = 0
   for (const { resource, channel } of campaigns) {
-    const scheduledAt = resource.attributes?.scheduled_at
-    let date: Date | null = null
-    if (scheduledAt) {
-      const parsed = new Date(scheduledAt)
-      if (!Number.isNaN(parsed.getTime())) {
-        date = parsed
-        campaignDates.push({ date: parsed, channel })
-      }
+    const date = resolveCampaignSendDate(resource.attributes)
+    if (date) {
+      campaignDates.push({ date, channel })
     }
 
     campaignMeta.push({

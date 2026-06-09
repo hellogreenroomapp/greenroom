@@ -67,8 +67,9 @@
       <div>
         <h3 class="text-sm font-semibold text-text mb-1">Story calendar</h3>
         <p class="text-xs text-muted mb-3">
-          Scheduled Klaviyo campaigns on their send dates, plus GreenRoom suggestions from pipeline
-          launches and your monthly send plan. Shopify intelligence comes later.
+          Scheduled Klaviyo campaigns on their send dates, plus GreenRoom suggestions toward your
+          send plan ({{ cadenceTargetsForStory.emailsPerMonth }} emails ·
+          {{ cadenceTargetsForStory.smsPerMonth }} SMS / month). Shopify intelligence comes later.
         </p>
         <MarketingSuggestedCalendar
           :items="storyCalendarItems"
@@ -369,14 +370,12 @@ const storyCalendarItems = computed(() => {
 const storyCalendarLoading = ref(false)
 let storyBuildTimer: ReturnType<typeof setTimeout> | null = null
 
+const cadenceTargetsForStory = computed(() => getMarketingCadenceTargets(marketing.value))
+
 const cadencePlanKey = computed(() => {
-  const t = getMarketingCadenceTargets(brandStore.currentBrand?.marketing)
+  const t = cadenceTargetsForStory.value
   return `${t.emailsPerMonth}:${t.smsPerMonth}`
 })
-
-const cadenceTargetsForStory = computed(() =>
-  getMarketingCadenceTargets(brandStore.currentBrand?.marketing)
-)
 
 function scheduleStoryCalendarBuild() {
   if (storyBuildTimer) clearTimeout(storyBuildTimer)
@@ -397,8 +396,9 @@ function scheduleStoryCalendarBuild() {
         projects.value,
         90,
         klaviyoInsights.value,
-        undefined,
-        cadenceTargetsForStory.value
+        marketing.value,
+        cadenceTargetsForStory.value,
+        marketingEvents.value
       )
       const saved = getSavedMarketingStories(brandStore.currentBrand?.marketing)
       storyCalendarBeats.value = mergeSavedStoriesIntoCalendar(
@@ -424,6 +424,8 @@ watch(
     projects.value.length,
     klaviyoInsights.value?.syncedAt?.toMillis?.() ?? '',
     marketing.value.savedStories?.length ?? 0,
+    marketingEvents.value.length,
+    marketingEvents.value[0]?.syncedAt?.toMillis?.() ?? '',
   ],
   scheduleStoryCalendarBuild,
   { immediate: true }

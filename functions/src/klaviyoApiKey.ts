@@ -81,7 +81,8 @@ export async function validateKlaviyoApiKey(apiKey: string): Promise<string> {
 
   await probeKlaviyoScope(apiKey, '/lists/?page[size]=1', 'lists:read')
   await probeKlaviyoScope(apiKey, '/segments/?page[size]=1', 'segments:read')
-  await probeKlaviyoScope(apiKey, '/metrics/?page[size]=1', 'metrics:read')
+  // Metrics API uses cursor pagination only — page[size] is not valid for this resource
+  await probeKlaviyoScope(apiKey, '/metrics/?fields[metric]=name', 'metrics:read')
 
   return accountLabel
 }

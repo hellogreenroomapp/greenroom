@@ -2,7 +2,14 @@ import type { Product } from '@/types'
 import type { MarketingEventRecord } from '@/types/marketingEvents'
 import type { MarketingEventKind } from '@/types/integrations'
 import type { MarketingStoryBeat, StoryChannel } from '@/utils/marketingStoryCalendar'
-import { storyBeatChipColor, storyBeatDayKey } from '@/utils/marketingStoryCalendar'
+import {
+  reseatStoryBeatOnDate,
+  snapSendToMonthlySpreadDay,
+  storyBeatChipColor,
+  storyBeatDayKey,
+  storyMonthSpreadBounds,
+  storyMonthSpreadIdealDay,
+} from '@/utils/marketingStoryCalendar'
 import { findProductForCampaignTitle } from '@/utils/klaviyoCampaignMatch'
 
 const MS_DAY = 24 * 60 * 60 * 1000
@@ -254,6 +261,132 @@ export function beatsToStoryItems(beats: MarketingStoryBeat[]): StoryCalendarIte
   return beats.map(beatToItem)
 }
 
+type DayChannelSlots = { email: number; sms: number }
+
+function emptyDayChannelSlots(): DayChannelSlots {
+  return { email: 0, sms: 0 }
+}
+
+function monthKeyUTC(d: Date): string {
+  return `${d.getUTCFullYear()}-${d.getUTCMonth()}`
+}
+
+function occupyChannelSlot(
+  map: Map<string, DayChannelSlots>,
+  day: Date,
+  channel: StoryChannel
+): void {
+  const key = storyBeatDayKey(day)
+  const slots = map.get(key) ?? emptyDayChannelSlots()
+  if (channel === 'email') slots.email++
+  else slots.sms++
+  map.set(key, slots)
+}
+
+function itemSpreadPriority(item: StoryCalendarItem): number {
+  if (item.beat?.storyKind === 'launch') return 0
+  if (item.beat?.storyKind === 'best_sellers') return 1
+  return 2
+}
+
+function sortItemsForChannelSpread(items: StoryCalendarItem[]): StoryCalendarItem[] {
+  return [...items].sort(
+    (a, b) =>
+      itemSpreadPriority(a) - itemSpreadPriority(b) ||
+      a.sendDate.getTime() - b.sendDate.getTime() ||
+      a.id.localeCompare(b.id)
+  )
+}
+
+function spreadChannelItemsInMonth(
+  items: StoryCalendarItem[],
+  channel: StoryChannel,
+  anchor: Date,
+  spreadStart: Date,
+  monthEnd: Date,
+  slots: Map<string, DayChannelSlots>
+): StoryCalendarItem[] {
+  const channelItems = sortItemsForChannelSpread(items.filter((i) => i.channel === channel))
+  if (channelItems.length === 0) return []
+
+  const total = channelItems.length
+  const minGap = Math.max(2, Math.floor(daysBetween(spreadStart, monthEnd) / Math.max(1, total)))
+  const placed: StoryCalendarItem[] = []
+
+  for (let i = 0; i < channelItems.length; i++) {
+    const item = channelItems[i]!
+    const ideal = storyMonthSpreadIdealDay(anchor, spreadStart, monthEnd, i, total)
+    const chosen = snapSendToMonthlySpreadDay(
+      ideal,
+      channel,
+      slots,
+      spreadStart,
+      monthEnd,
+      minGap,
+      item.sendDate
+    )
+    if (!chosen) continue
+
+    occupyChannelSlot(slots, chosen, channel)
+    const reseatedBeat = item.beat ? reseatStoryBeatOnDate(item.beat, chosen) : undefined
+    placed.push({
+      ...item,
+      sendDate: chosen,
+      displayLabel: reseatedBeat?.displayLabel ?? item.displayLabel,
+      title: reseatedBeat?.title ?? item.title,
+      beat: reseatedBeat,
+    })
+  }
+
+  return placed
+}
+
+function daysBetween(a: Date, b: Date): number {
+  return Math.round((b.getTime() - a.getTime()) / MS_DAY)
+}
+
+/** Klaviyo dates stay fixed; suggestions spread across the full month per channel. */
+function spreadStoryCalendarItems(
+  items: StoryCalendarItem[],
+  horizonEnd: Date,
+  today: Date
+): StoryCalendarItem[] {
+  const slots = new Map<string, DayChannelSlots>()
+
+  const pinned = items.filter((i) => i.source === 'klaviyo')
+  const movable = items.filter((i) => i.source === 'suggested')
+
+  for (const item of pinned) {
+    occupyChannelSlot(slots, item.sendDate, item.channel)
+  }
+
+  const byMonth = new Map<string, StoryCalendarItem[]>()
+  for (const item of movable) {
+    const mk = monthKeyUTC(item.sendDate)
+    const list = byMonth.get(mk)
+    if (list) list.push(item)
+    else byMonth.set(mk, [item])
+  }
+
+  const placed: StoryCalendarItem[] = []
+  const monthKeys = [...byMonth.keys()].sort()
+
+  for (const mk of monthKeys) {
+    const monthItems = byMonth.get(mk) ?? []
+    if (monthItems.length === 0) continue
+
+    const anchor = monthItems[0]!.sendDate
+    const { spreadStart, monthEnd } = storyMonthSpreadBounds(anchor, today, horizonEnd)
+
+    placed.push(
+      ...spreadChannelItemsInMonth(monthItems, 'email', anchor, spreadStart, monthEnd, slots),
+      ...spreadChannelItemsInMonth(monthItems, 'sms', anchor, spreadStart, monthEnd, slots)
+    )
+  }
+
+  return [...pinned, ...placed].sort((a, b) => a.sendDate.getTime() - b.sendDate.getTime())
+}
+
 export function mergeStoryCalendarItems(
   klaviyoItems: StoryCalendarItem[],
   suggestedItems: StoryCalendarItem[]
@@ -282,5 +415,8 @@ export function buildStoryCalendarView(
 
   const klaviyo = klaviyoRecordsToStoryItems(klaviyoRecords, start, end)
   const suggested = beatsToStoryItems(beats)
-  return mergeStoryCalendarItems(klaviyo, suggested)
+  const merged = mergeStoryCalendarItems(klaviyo, suggested)
+  const todayStart = new Date(today)
+  todayStart.setHours(12, 0, 0, 0)
+  return spreadStoryCalendarItems(merged, end, todayStart)
 }

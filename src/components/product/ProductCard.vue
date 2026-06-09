@@ -36,6 +36,19 @@
       No live date
     </span>
 
+    <div
+      v-if="showCardImage"
+      class="mb-2 rounded-md overflow-hidden bg-bg border border-border/70"
+      :class="condensed ? 'h-16' : 'h-28'"
+    >
+      <img
+        :src="cardImageUrl"
+        :alt="product.name"
+        class="w-full h-full object-cover"
+        loading="lazy"
+      />
+    </div>
+
     <!-- Condensed View: Only name, colors, SKU, and go live date -->
     <template v-if="condensed">
       <div
@@ -197,6 +210,7 @@ import {
   isPastExFactoryAwaitingShip,
   isFactoryProductionStage,
 } from '@/utils/dates'
+import { getProductDisplayImageUrl } from '@/utils/productDisplay'
 import { getDoc } from '@/firebase/firestore'
 
 const props = defineProps<{
@@ -206,6 +220,8 @@ const props = defineProps<{
 }>()
 
 const condensed = computed(() => props.condensed === true)
+const cardImageUrl = computed(() => getProductDisplayImageUrl(props.product))
+const showCardImage = computed(() => props.showImage === true && !!cardImageUrl.value)
 
 const emit = defineEmits<{
   click: []
